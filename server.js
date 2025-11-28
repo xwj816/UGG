@@ -1,3 +1,4 @@
+//你好呀
 // server.js
 const express = require("express");
 const http = require("http");
@@ -241,3 +242,4 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+

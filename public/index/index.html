@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>你猜猜 - 畫布 + 聊天</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <header class="sidebar-header">
+        <div class="logo">你猜猜</div>
+        <div class="me-info">
+          <span class="me-name" id="meNameDisplay">尚未加入</span>
+        </div>
+      </header>
+
+      <section class="card small-card">
+        <div class="round-row">
+          <span class="round-label">畫家：</span>
+          <span id="drawerName">尚未開始</span>
+        </div>
+        <div class="round-row">
+          <span class="round-label">題目：</span>
+          <span id="wordHint">尚未出題</span>
+        </div>
+        <p id="roundInfo" class="round-info-text">請等待遊戲開始...</p>
+      </section>
+
+      <section class="card" id="drawerSection" style="display:none;">
+        <h2 class="card-title">輪到你出題 🎨</h2>
+        <label class="field-label">
+          輸入題目
+          <input id="wordInput" class="text-input" placeholder="例如：貓咪、蘋果、電腦...">
+        </label>
+        <button id="startBtn" class="primary-btn">開始這一回合</button>
+      </section>
+
+      <section class="card chat-card">
+        <h2 class="card-title">聊天室 / 猜題區</h2>
+        <div id="chatLog" class="chat-log"></div>
+        <div class="chat-input-row">
+          <input id="chatInput" class="text-input" placeholder="輸入訊息（也會當作猜題），按 Enter 送出">
+          <button id="chatSendBtn" class="secondary-btn">送出</button>
+        </div>
+      </section>
+
+      <section class="card score-card">
+        <h2 class="card-title">分數排行榜</h2>
+        <pre id="scoreBoard" class="score-text">尚未有分數</pre>
+      </section>
+    </aside>
+
+    <main class="canvas-main">
+      <header class="canvas-header">
+        <div>房間畫布（全員共用）</div>
+      </header>
+
+      <div class="canvas-wrapper">
+        <canvas id="myCanvas" width="800" height="500"></canvas>
+
+        <div class="toolbar">
+          <div class="tools-left">
+            <button class="tool-btn active" data-tool="pen">✏️</button>
+            <button class="tool-btn" data-tool="fill">🪣</button>
+            <button class="tool-btn" data-tool="eraser">🧼</button>
+            <button class="tool-btn btn-clear" id="clearBtn">🗑️</button>
+          </div>
+
+          <input type="range" class="size-slider" id="sizePicker" min="2" max="40" value="5">
+
+          <div class="colors" id="colorPalette"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    // ============================================================
+    // 1. Socket.io：房間 / 出題 / 猜題 / 聊天
+    // ============================================================
+    const socket = io();
+    
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            username: params.get('username'),
+            roomId: params.get('roomId')
+        };
+    }
+
+    const meNameDisplay = document.getElementById('meNameDisplay');
+    const drawerNameSpan = document.getElementById('drawerName');
+    const wordHintSpan   = document.getElementById('wordHint');
+    const roundInfo      = document.getElementById('roundInfo');
+
+    const drawerSection  = document.getElementById('drawerSection');
+    const wordInput      = document.getElementById('wordInput');
+    const startBtn       = document.getElementById('startBtn');
+
+    const chatLog     = document.getElementById('chatLog');
+    const chatInput   = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+
+    const scoreBoard  = document.getElementById('scoreBoard');
+
+    const state = {
+        roomId: null,
+        userId: null, 
+        nickname: null,
+    };
+    
+    // 等待 socket 連線建立後，將 socket.id 賦予給 state.userId
+    socket.on('connect', () => {
+        state.userId = socket.id;
+        autoJoinRoom(); // 連線成功後，立即嘗試自動加入房間
+    });
+
+    function appendChatLine(text, type = 'normal') {
+      const div = document.createElement('div');
+      div.classList.add('chat-line');
+      if (type === 'system') div.classList.add('chat-line-system');
+      if (type === 'me') div.classList.add('chat-line-me');
+      div.textContent = text;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function renderScores(scores) {
+      if (!scores || Object.keys(scores).length === 0) {
+        scoreBoard.textContent = '尚未有分數';
+        return;
+      }
+      let lines = [];
+      // 這裡假設 scores 鍵值對為 { userId: score }
+      for (const [userId, score] of Object.entries(scores)) {
+        // 為了在沒有暱稱的情況下區分用戶，我們只顯示部分 ID
+        let displayId = (userId === state.userId) ? state.nickname : `ID=${userId.substring(0, 5)}...`;
+        lines.push(`${displayId}：${score} 分`); 
+      }
+      scoreBoard.textContent = lines.join('\n');
+    }
+
+    // 🎯 自動加入房間邏輯
+    function autoJoinRoom() {
+        if (!state.userId) return; 
+        
+        const { username, roomId } = getUrlParams();
+        
+        if (!roomId || !username) {
+            alert('錯誤：缺少房間 ID 或用戶名！將導回登入頁面。');
+            window.location.href = 'login.html'; // 導回登入頁面
+            return;
+        }
+
+        state.roomId = roomId;
+        state.nickname = username;
+        
+        const nickname = username;
+        const userId = state.userId;
+
+        // 發送 joinRoom 事件
+        socket.emit('joinRoom', { roomId, userId, nickname });
+
+        meNameDisplay.textContent = nickname;
+        appendChatLine(`你已自動加入房間 ${roomId}`, 'system');
+        roundInfo.textContent = '房間初始化完成，等待遊戲開始...';
+    }
+
+
+    // 出題（開始回合）
+    startBtn.addEventListener('click', () => {
+      const word = wordInput.value.trim();
+      if (!word) {
+        alert('請輸入題目～');
+        return;
+      }
+      if (!state.roomId) {
+        alert('請先加入房間！');
+        return;
+      }
+
+      socket.emit('startRound', {
+        roomId: state.roomId,
+        word,
+      });
+
+      appendChatLine(`你出題：「${word}」`, 'system');
+      wordInput.value = '';
+    });
+
+    // 聊天 / 猜題送出
+    function sendChatAndGuess() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      if (!state.roomId) {
+        alert('請先加入房間！');
+        return;
+      }
+
+      // 1. 廣播聊天室訊息
+      socket.emit('chatMessage', {
+        roomId: state.roomId,
+        text,
+      });
+
+      // 2. 同時當作猜題
+      socket.emit('guess', {
+        roomId: state.roomId,
+        text,
+      });
+
+      appendChatLine(`你：${text}`, 'me');
+      chatInput.value = '';
+    }
+
+    chatSendBtn.addEventListener('click', sendChatAndGuess);
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendChatAndGuess();
+      }
+    });
+
+    // ===== 後端事件 (保持不變) =====
+    socket.on('roundStartedForDrawer', ({ word }) => {
+      drawerNameSpan.textContent = state.nickname || '(你)';
+      wordHintSpan.textContent = `${word}（你自己知道答案 😆）`;
+      roundInfo.textContent = `本回合題目已設定，字數：${word.length}`;
+      appendChatLine(`【系統】你本回合的題目是：「${word}」`, 'system');
+    });
+
+    socket.on('roundStarted', ({ drawerNickname, wordLength }) => {
+      drawerNameSpan.textContent = drawerNickname;
+      wordHintSpan.textContent = `${wordLength} 個字`;
+      roundInfo.textContent = `輪到 ${drawerNickname} 畫圖，題目有 ${wordLength} 個字。`;
+      appendChatLine(`【系統】畫家：${drawerNickname}，題目有 ${wordLength} 個字。`, 'system');
+    });
+
+    socket.on('nextDrawer', ({ drawerSocketId, drawerNickname }) => {
+      const isMeDrawer = (socket.id === drawerSocketId);
+      drawerNameSpan.textContent = drawerNickname;
+
+      if (isMeDrawer) {
+        drawerSection.style.display = 'block';
+        roundInfo.textContent = '輪到你出題，請輸入新題目！';
+        appendChatLine('【系統】輪到你當畫家了！', 'system');
+      } else {
+        drawerSection.style.display = 'none';
+        roundInfo.textContent = `下一回合輪到 ${drawerNickname} 出題，請等待他輸入題目～`;
+        appendChatLine(`【系統】下一回合輪到 ${drawerNickname} 出題。`, 'system');
+      }
+    });
+
+    socket.on('scoreUpdate', ({ scores }) => {
+      renderScores(scores);
+    });
+
+    socket.on('roundEnded', ({ winnerUserId, drawerUserId, answer, scores }) => {
+      renderScores(scores);
+      wordHintSpan.textContent = `答案：${answer}`;
+      roundInfo.textContent = `本回合結束，答案是「${answer}」。`;
+      appendChatLine(`🎉 回合結束！答案是「${answer}」。`, 'system');
+    });
+
+    socket.on('chatMessage', ({ nickname, userId, text }) => {
+      appendChatLine(`${nickname}：${text}`);
+    });
+
+    // ============================================================
+    // 2. 畫布同步 (保持不變)
+    // ============================================================
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    // 這裡繼續使用一個獨立的 ID 進行畫布同步，與遊戲邏輯的 state.userId 分開
+    const userIdForCanvas = 'canvas_user_' + Math.random().toString(36).substr(2, 9); 
+
+    let currentTool = 'pen';
+    let currentColor = '#000000';
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+    let lastSyncedId = 0;
+    let localVersion = -1; 
+
+    // 顏色選單 (保持不變)
+    const colors = [
+      '#000000', '#555555', '#ffffff',
+      '#ff0000', '#ff8800', '#ffff00',
+      '#00ff00', '#00ffff', '#0000ff', '#800080'
+    ];
+    const paletteContainer = document.getElementById('colorPalette');
+
+    colors.forEach((c, index) => {
+      const div = document.createElement('div');
+      div.className = 'color-swatch' + (index === 0 ? ' active' : '');
+      div.style.backgroundColor = c;
+      div.onclick = () => selectColor(c, div);
+      paletteContainer.appendChild(div);
+    });
+
+    function selectColor(color, element) {
+      currentColor = color;
+      document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    // 工具按鈕 (保持不變)
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tool = btn.getAttribute('data-tool');
+        currentTool = tool;
+        document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // 清空按鈕
+    document.getElementById('clearBtn').addEventListener('click', clearServerCanvas);
+
+    // 取得座標 (保持不變)
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      let clientX, clientY;
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      const pos = getPos(e);
+
+      if (currentTool === 'fill') {
+        drawAndSend(pos.x, pos.y, pos.x, pos.y, 'fill');
+      } else {
+        isDrawing = true;
+        [lastX, lastY] = [pos.x, pos.y];
+        drawAndSend(pos.x, pos.y, pos.x, pos.y, currentTool);
+      }
+    }
+
+    function moveDraw(e) {
+      e.preventDefault();
+      if (!isDrawing) return;
+      const pos = getPos(e);
+      drawAndSend(lastX, lastY, pos.x, pos.y, currentTool);
+      [lastX, lastY] = [pos.x, pos.y];
+    }
+
+    function endDraw(e) {
+      e.preventDefault();
+      isDrawing = false;
+    }
+
+    // 滑鼠/觸控事件 (保持不變)
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', moveDraw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseout', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove',  moveDraw,  { passive: false });
+    canvas.addEventListener('touchend',   endDraw);
+
+    function drawAndSend(x0, y0, x1, y1, type) {
+      const size = document.getElementById('sizePicker').value;
+      renderStroke(x0, y0, x1, y1, currentColor, size, type);
+
+      fetch('/api/draw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userIdForCanvas,
+          x0, y0, x1, y1, color: currentColor, size, type
+        })
+      }).catch(console.error);
+    }
+
+    function renderStroke(x0, y0, x1, y1, color, size, type) {
+      if (type === 'fill') {
+        floodFill(Math.floor(x0), Math.floor(y0), color);
+        return;
+      }
+      ctx.beginPath();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = size;
+      ctx.strokeStyle = (type === 'eraser') ? '#ffffff' : color;
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+      ctx.closePath();
+    }
+
+    function floodFill(startX, startY, fillColor) {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      const r = parseInt(fillColor.slice(1, 3), 16);
+      const g = parseInt(fillColor.slice(3, 5), 16);
+      const b = parseInt(fillColor.slice(5, 7), 16);
+
+      const startPos = (startY * canvas.width + startX) * 4;
+      const startR = data[startPos], startG = data[startPos+1], startB = data[startPos+2], startA = data[startPos+3];
+
+      if (startR === r && startG === g && startB === b && startA === 255) return;
+
+      const stack = [[startX, startY]];
+      while (stack.length) {
+        const [x, y] = stack.pop();
+        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+        const pos = (y * canvas.width + x) * 4;
+        if (data[pos] !== startR || data[pos+1] !== startG || data[pos+2] !== startB || data[pos+3] !== startA) continue;
+
+        data[pos] = r; data[pos+1] = g; data[pos+2] = b; data[pos+3] = 255;
+        stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    // 定期同步其他人的線條 (保持不變)
+    setInterval(() => {
+      fetch('/api/fetch_strokes?last_id=' + lastSyncedId)
+        .then(res => res.json())
+        .then(data => {
+          if (localVersion === -1) {
+            localVersion = data.version;
+          } else if (data.version > localVersion) {
+            // 有人清空了
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            lastSyncedId = 0;
+            localVersion = data.version;
+            return;
+          }
+
+          if (data.strokes && data.strokes.length > 0) {
+            data.strokes.forEach(s => {
+              if (s.user_id !== userIdForCanvas) {
+                renderStroke(s.x0, s.y0, s.x1, s.y1, s.color, s.size, s.type);
+              }
+              lastSyncedId = s.id;
+            });
+          }
+        })
+        .catch(console.error);
+    }, 500);
+
+    function clearServerCanvas() {
+      fetch('/api/clear', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          lastSyncedId = 0;
+          localVersion = data.version;
+        })
+        .catch(console.error);
+    }
+  </script>
+</body>
+</html>

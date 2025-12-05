@@ -1,0 +1,306 @@
+/* lobby/lobby.css */
+:root {
+    --gartic-blue: #0087ff;
+    --gartic-yellow: #ffde00; 
+    --dark-blue: #0056cc;
+    --dark-yellow: #f6b500;
+    --text-dark: #333;
+    --text-light: #f4f4f4;
+    --panel-bg: #fff;
+}
+
+body {
+    background-color: var(--gartic-blue);
+    padding: 20px;
+}
+
+/* 遊戲整體佈局 (聊天室/分數 + 畫布) */
+.game-layout {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: calc(100vh - 40px); /* 扣掉 body padding */
+    gap: 20px;
+}
+
+/* --------------------------- */
+/* 左側欄：聊天室與分數板 */
+/* --------------------------- */
+.sidebar {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.game-header, .score-board, .chat-box {
+    background-color: var(--panel-bg);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.room-title {
+    color: var(--dark-blue);
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.game-status {
+    background-color: var(--gartic-yellow);
+    padding: 5px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: var(--text-dark);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.current-word {
+    font-size: 1.1em;
+    font-style: italic;
+    color: var(--text-medium);
+    text-align: center;
+}
+
+/* 分數板樣式 */
+.score-board h3 {
+    margin-top: 0;
+    color: var(--gartic-blue);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+#playerList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.player-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-weight: 500;
+}
+
+.player-item:not(:last-child) {
+    border-bottom: 1px dashed #eee;
+}
+
+.player-item.self {
+    background-color: var(--gartic-yellow);
+    padding: 5px;
+    margin: 0 -5px;
+    border-radius: 4px;
+}
+
+.player-item.drawer .player-name {
+    font-weight: bold;
+    color: var(--dark-blue);
+}
+
+.score {
+    font-weight: bold;
+}
+
+/* 聊天室樣式 */
+.chat-box {
+    flex-grow: 1; /* 佔據剩餘空間 */
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 40vh; /* 限制聊天室高度 */
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.message {
+    margin: 5px 0;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message .user {
+    font-weight: bold;
+    color: var(--gartic-blue);
+}
+
+.message.system-message {
+    text-align: center;
+    font-style: italic;
+    color: var(--text-medium);
+}
+
+.chat-input-form {
+    display: flex;
+}
+
+#chatInput {
+    flex-grow: 1;
+    padding: 10px;
+    border: 2px solid var(--gartic-blue);
+    border-radius: 5px 0 0 5px;
+    font-size: 1em;
+}
+
+.chat-input-form button {
+    background-color: var(--gartic-blue);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
+    transition: background-color 0.1s;
+}
+
+.chat-input-form button:hover {
+    background-color: var(--dark-blue);
+}
+
+/* --------------------------- */
+/* 右側：畫布與工具列 */
+/* --------------------------- */
+.drawing-area {
+    flex-grow: 1;
+    background-color: var(--panel-bg);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tool-button, .special-button {
+    background-color: var(--text-light);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.1s;
+    font-weight: bold;
+}
+
+.tool-button.active, .tool-button:hover:not(:disabled) {
+    background-color: var(--gartic-blue);
+    box-shadow: 0 2px 0 var(--dark-blue);
+    position: relative;
+    top: -1px;
+}
+
+.tool-button:disabled {
+    cursor: not-allowed;
+    background-color: #eee;
+    color: var(--text-light);
+    box-shadow: none;
+}
+
+.special-button {
+    background-color: var(--gartic-yellow);
+    color: var(--text-dark);
+    box-shadow: 0 3px 0 var(--dark-yellow);
+}
+
+.special-button:hover {
+    background-color: #ffc400;
+}
+
+.color-picker {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.size-slider {
+    width: 80px;
+    cursor: pointer;
+}
+
+/* 畫布本身 */
+#drawingCanvas {
+    flex-grow: 1; /* 佔據所有剩餘空間 */
+    background-color: white;
+    border: 1px solid #ccc;
+    cursor: crosshair; /* 畫筆游標 */
+    width: 100%; /* 確保寬度填滿 */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* --------------------------- */
+/* 彈出視窗 (Modal) 樣式 */
+/* --------------------------- */
+.modal {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6); /* 黑色半透明背景 */
+    backdrop-filter: blur(3px);
+}
+
+.modal-content {
+    background-color: var(--panel-bg);
+    margin: 15% auto; /* 距頂部 15% */
+    padding: 20px;
+    border: 5px solid var(--gartic-blue);
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+    color: var(--gartic-blue);
+    margin-top: 0;
+    border-bottom: 2px solid var(--gartic-yellow);
+    padding-bottom: 10px;
+}
+
+#wordInput {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid var(--panel-border);
+    border-radius: 5px;
+    font-size: 1.1em;
+}
+
+.modal-content .special-button {
+    background-color: var(--gartic-blue);
+    color: white;
+    border: 3px solid var(--dark-blue);
+    box-shadow: 0 4px 0 var(--dark-blue);
+    font-size: 1.1em;
+    padding: 10px 20px;
+}
+
+.modal-content .special-button:hover {
+    box-shadow: 0 2px 0 var(--dark-blue);
+    top: 2px;
+}

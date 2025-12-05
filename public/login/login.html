@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你猜猜 - 登入</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+    <div class="background-pattern"></div>
+
+    <header class="main-header">
+        <h1 class="logo">你猜猜</h1> 
+        <div class="user-display">
+            <span class="username" id="displayUsername">訪客名稱載入中...</span>
+            <div class="avatar-sm">😊</div>
+        </div>
+    </header>
+    
+    <!-- 這裡 method 用 GET 就好，action 交給 JS 處理 -->
+    <form class="main-container" id="loginForm" method="GET">
+        
+        <div class="top-bar">
+            <div class="ribbon-title">加入房間</div>
+        </div>
+
+        <div class="content-wrapper">
+
+            <section class="user-info-panel">
+                <h2>你的資訊</h2>
+                <div class="user-avatar-lg">😁</div>
+                
+                <div class="username-input-wrapper">
+                    <input
+                        type="text"
+                        id="inputUsername"
+                        name="username"
+                        value=""
+                        placeholder="輸入你的名字"
+                        required
+                    >
+                </div>
+                
+            </section>
+        </div>
+        
+        <div class="buttons-wrapper">
+            <!-- 房間按鈕之後可以帶 username 過去，邏輯在 login.js 已經有寫 -->
+            <a href="../room/room.html" class="room-button">
+                🚪
+                <span>房間</span>
+            </a>
+
+            <button class="play-button" type="submit">
+                🎮
+                <span>遊玩</span>
+            </button>
+        </div>
+        
+    </form>
+    
+    <script src="login.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+/* css/login.css 檔案內容 */
+
+:root {
+    --gartic-blue: #0087ff;
+    --gartic-yellow: #ffde00; 
+    --panel-border: #ccc;
+    --panel-shadow: rgba(0, 0, 0, 0.2);
+    --dark-blue: #0056cc;
+    --dark-yellow: #f6b500;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #777;
+}
+
+body {
+    font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif; 
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+    position: relative;
+    overflow-x: hidden;
+    background-color: var(--gartic-blue); 
+}
+
+/* 藍色背景和圖案 */
+.background-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--gartic-blue);
+    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: -1;
+    opacity: 0.9; 
+}
+
+/* -------------------------------------- */
+/* 頁面頂部 Header (Logo, 用戶名) */
+/* -------------------------------------- */
+.main-header {
+    position: absolute;
+    top: 20px;
+    width: 90%;
+    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 3em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 0px var(--dark-blue); 
+    letter-spacing: -1px;
+}
+
+.user-display {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.avatar-sm {
+    width: 30px;
+    height: 30px;
+    background-color: var(--gartic-yellow);
+    border-radius: 50%;
+    border: 3px solid white;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em; 
+    line-height: 1; 
+}
+
+/* -------------------------------------- */
+/* 主要容器 (白色的卡片) */
+/* -------------------------------------- */
+.main-container {
+    width: 90%;
+    max-width: 450px; /* 寬度減小以符合單欄設計 */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px var(--panel-shadow);
+    padding: 20px;
+    padding-top: 0; 
+    margin-top: 150px; 
+    margin-bottom: 50px;
+    position: relative;
+    text-align: center; 
+}
+
+.top-bar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 藍色緞帶標題 */
+.ribbon-title {
+    display: inline-block;
+    background-color: var(--gartic-blue);
+    color: white;
+    font-size: 1.8em;
+    font-weight: bold;
+    padding: 5px 30px;
+    border-radius: 5px;
+    position: relative;
+    top: -20px; 
+    text-shadow: 1px 1px 0 var(--dark-blue);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 80% 100%, 50% 80%, 20% 100%, 0 100%);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+}
+
+/* -------------------------------------- */
+/* 內容區塊 ('你的資訊') */
+/* -------------------------------------- */
+.content-wrapper {
+    display: flex;
+    justify-content: center; 
+    padding: 20px 0;
+    padding-top: 0;
+}
+
+.user-info-panel {
+    width: 100%; 
+    padding: 10px;
+    text-align: center;
+}
+
+.user-info-panel h2 {
+    color: var(--text-medium);
+    font-size: 1.1em;
+    font-weight: normal;
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.user-avatar-lg {
+    width: 100px;
+    height: 100px;
+    background-color: var(--gartic-yellow);
+    border-radius: 50%;
+    border: 5px solid var(--gartic-blue);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4em; 
+    line-height: 1;
+}
+
+.username-input-wrapper {
+    background-color: #eee;
+    border: 2px solid var(--panel-border);
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+#inputUsername { /* 注意：使用 ID 選擇器 */
+    width: 100%;
+    padding: 8px;
+    border: none;
+    background: transparent;
+    font-size: 1.2em;
+    font-weight: bold;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/* ... (login.css 頂部內容省略) ... */
+
+/* -------------------------------------- */
+/* 新增：雙按鈕容器 (Button Wrapper) */
+/* -------------------------------------- */
+.buttons-wrapper {
+    display: flex;
+    justify-content: space-between; /* 兩個按鈕左右分開 */
+    gap: 15px;
+    padding: 20px;
+    padding-top: 5px;
+}
+
+/* 確保按鈕填滿容器 */
+.room-button,
+.play-button {
+    flex: 1; /* 讓兩個按鈕平均分配寬度 */
+    width: 50%; /* 確保在 IE/舊瀏覽器上也有效果 */
+    /* 繼承遊玩按鈕的樣式，但修改顏色 */
+    font-size: 1.5em;
+    font-weight: bold;
+    border-radius: 50px;
+    padding: 10px 0; /* 垂直填充 */
+    text-align: center;
+    transition: all 0.1s;
+    text-decoration: none; /* 移除 a 標籤的下劃線 */
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; /* 內容居中 */
+    gap: 10px;
+    position: relative;
+    top: 0;
+}
+
+/* -------------------------------------- */
+/* 房間按鈕樣式 (藍色，模仿原圖) */
+/* -------------------------------------- */
+.room-button {
+    background-color: var(--gartic-blue); /* 藍色背景 */
+    color: white; /* 白色文字 */
+    border: 3px solid var(--dark-blue); 
+    box-shadow: 0 5px 0 var(--dark-blue), 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.room-button:hover {
+    top: 2px;
+    box-shadow: 0 3px 0 var(--dark-blue), 0 8px 10px rgba(0, 0, 0, 0.1);
+}
+
+.room-button:active {
+    top: 5px;
+    box-shadow: 0 0 0 var(--dark-blue);
+}
+
+/* -------------------------------------- */
+/* 遊玩按鈕樣式 (黃色) */
+/* -------------------------------------- */
+.play-button {
+    background-color: var(--gartic-yellow);
+    color: var(--text-dark);
+    border: 3px solid var(--dark-yellow); 
+    box-shadow: 0 5px 0 var(--dark-yellow), 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.play-button:hover {
+    top: 2px;
+    box-shadow: 0 3px 0 var(--dark-yellow), 0 8px 10px rgba(0, 0, 0, 0.1);
+}
+
+.play-button:active {
+    top: 5px;
+    box-shadow: 0 0 0 var(--dark-yellow);
+}
+
+/* 移除原有的 .play-button-wrapper */
+.play-button-wrapper {
+    display: none;
+}
+
+/* -------------------------------------- */
+/* 移除不需要的元素，確保它們不顯示 */
+/* -------------------------------------- */
+.download-section, .login-prompt, .social-login, .game-stats-panel, .main-footer {
+    display: none;
+}

@@ -1,0 +1,321 @@
+/*
+ * room/room.css
+ * 包含所有 Gartic 風格、按鈕、佈局以及房間頁面特有的樣式。
+ */
+
+/* -------------------------------------- */
+/* 基礎設定 & 變數 (與 login 保持一致) */
+/* -------------------------------------- */
+:root {
+    --gartic-blue: #0087ff;
+    --gartic-yellow: #ffde00; 
+    --panel-border: #ccc;
+    --panel-shadow: rgba(0, 0, 0, 0.2);
+    --dark-blue: #0056cc;
+    --dark-yellow: #f6b500;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #777;
+}
+
+body {
+    font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif; 
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+    position: relative;
+    overflow-x: hidden;
+    background-color: var(--gartic-blue); 
+}
+
+/* 藍色背景和圖案 */
+.background-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--gartic-blue);
+    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: -1;
+    opacity: 0.9; 
+}
+
+/* -------------------------------------- */
+/* 頂部 Header (與 login 保持一致) */
+/* -------------------------------------- */
+.main-header {
+    position: absolute;
+    top: 20px;
+    width: 90%;
+    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 3em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 0px var(--dark-blue); 
+    letter-spacing: -1px;
+}
+
+.user-display {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.avatar-sm {
+    width: 30px;
+    height: 30px;
+    background-color: var(--gartic-yellow);
+    border-radius: 50%;
+    border: 3px solid white;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em; 
+    line-height: 1; 
+}
+
+/* -------------------------------------- */
+/* 主要容器 (白色的卡片) */
+/* -------------------------------------- */
+.main-container {
+    width: 90%;
+    max-width: 450px; 
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px var(--panel-shadow);
+    padding: 20px;
+    padding-top: 0; 
+    margin-top: 150px; 
+    margin-bottom: 50px;
+    position: relative;
+    text-align: center; 
+}
+
+.top-bar {
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative; /* 【關鍵】: 為了定位返回圖標 */
+    padding-top: 20px; /* 給頂部空間，避免圖標貼邊 */
+}
+
+/* 藍色緞帶標題 */
+.ribbon-title {
+    display: inline-block;
+    background-color: var(--gartic-blue);
+    color: white;
+    font-size: 1.8em;
+    font-weight: bold;
+    /* 修正：增加左側 padding 讓文字避開返回圖標 */
+    padding: 5px 30px 5px 45px; 
+    border-radius: 5px;
+    position: relative;
+    top: -20px; 
+    text-shadow: 1px 1px 0 var(--dark-blue);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 80% 100%, 50% 80%, 20% 100%, 0 100%);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    z-index: 5; /* 確保在圖標下方 */
+}
+
+/* -------------------------------------- */
+/* 返回按鈕圖標樣式 (.back-link-icon) */
+/* -------------------------------------- */
+.back-link-icon {
+    position: absolute;
+    z-index: 10; /* 確保它在緞帶標題上方 */
+    
+    /* 調整定位，使其在左上方，並稍微突出邊緣 */
+    left: -15px; /* 向左移出 top-bar 邊緣 */
+    top: -5px; /* 向上微調，使其與緞帶頂端對齊 */
+    
+    /* 樣式和尺寸調整 */
+    background-color: var(--gartic-yellow);
+    border: 3px solid var(--dark-yellow); 
+    color: var(--dark-blue);
+    width: 45px; /* 增大尺寸 */
+    height: 45px; /* 增大尺寸 */
+    border-radius: 50%;
+    
+    /* 內容居中 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em; /* 增大字體 */
+    text-decoration: none;
+    
+    cursor: pointer;
+    box-shadow: 0 2px 0 var(--dark-yellow);
+    transition: top 0.1s, box-shadow 0.1s;
+}
+
+.back-link-icon:hover {
+    top: -4px; /* 根據新的 top 調整 hover 效果 */
+    box-shadow: 0 1px 0 var(--dark-yellow);
+}
+
+/* -------------------------------------- */
+/* 房間頁面佈局調整 (Room Layout) */
+/* -------------------------------------- */
+.content-wrapper {
+    /* 調整佈局以垂直堆疊兩個房間面板 */
+    flex-direction: column;
+    gap: 30px; /* 增加上下區塊的間距 */
+    display: flex; /* 必須保留 flex 讓內容區塊可以垂直堆疊 */
+    justify-content: center;
+    padding: 20px 0;
+    padding-top: 0;
+}
+
+.room-panel {
+    width: 100%; 
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* 確保兩個面板都有內邊距 */
+.create-room-panel, .join-room-panel {
+    padding: 10px 0;
+    border-bottom: 2px solid var(--panel-border); /* 區塊間的分隔線 */
+}
+
+.join-room-panel {
+    border-bottom: none; /* 移除最底下的分隔線 */
+}
+
+.panel-title {
+    color: var(--gartic-blue);
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.panel-title.join-title {
+    color: var(--text-dark); /* 讓標題顏色不要那麼突兀 */
+    font-size: 1.3em;
+}
+
+/* -------------------------------------- */
+/* 創建房間 (顯示代碼) */
+/* -------------------------------------- */
+
+.invite-code-display {
+    font-size: 3em;
+    font-weight: bold;
+    letter-spacing: 5px;
+    color: var(--dark-blue);
+    border: 3px dashed var(--gartic-yellow);
+    padding: 15px 10px;
+    margin: 20px 0;
+    background-color: #ffe89e; /* 淺黃色背景 */
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.panel-subtitle {
+    color: var(--text-medium);
+    margin-bottom: 30px;
+}
+
+.copy-button {
+    background-color: var(--gartic-yellow);
+    color: var(--text-dark);
+    border: 3px solid var(--dark-yellow); 
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 var(--dark-yellow);
+}
+
+.copy-button:hover {
+    top: -1px;
+    box-shadow: 0 5px 0 var(--dark-yellow);
+}
+
+.copy-button:active {
+    box-shadow: 0 0 0 var(--dark-yellow);
+    top: 4px;
+}
+
+
+/* -------------------------------------- */
+/* 加入房間 (輸入代碼) */
+/* -------------------------------------- */
+
+.code-input-wrapper {
+    background-color: #fff;
+    border: 2px solid var(--panel-border);
+    border-radius: 5px;
+    padding: 5px;
+    margin: 15px auto; /* 居中 */
+    max-width: 250px;
+    text-align: center;
+}
+
+#joinCode {
+    width: 90%;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    font-size: 1.4em;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase; /* 確保輸入是大寫 */
+    letter-spacing: 2px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/* 加入按鈕樣式 */
+.join-button {
+    background-color: var(--gartic-blue);
+    color: white;
+    border: 3px solid var(--dark-blue);
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 10px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 var(--dark-blue);
+    margin-top: 10px;
+}
+
+.join-button:hover {
+    top: -1px;
+    box-shadow: 5px 5px 0 var(--dark-blue);
+}
+
+.join-button:active {
+    box-shadow: 0 0 0 var(--dark-blue);
+    top: 4px;
+}
+
+
+/* -------------------------------------- */
+/* 移除舊的底部返回按鈕樣式 (以防萬一) */
+/* -------------------------------------- */
+.room-button {
+    display: none; 
+}
+.back-button {
+    display: none;
+}

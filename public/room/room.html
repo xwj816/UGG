@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你猜猜 - 房間邀請</title>
+    <link rel="stylesheet" href="room.css">
+</head>
+
+<body>
+    <div class="background-pattern"></div>
+<section class="room-panel create-room-panel">
+                <a href="../index/index.html" class="join-button" id="createRoomButton">🎉 進入房間</a>
+
+    <header class="main-header">
+        <h1 class="logo">你猜猜</h1> 
+        <div class="user-display">
+            <span class="username" id="headerUsernameDisplay">訪客名稱載入中...</span> 
+            <div class="avatar-sm">😊</div>
+        </div>
+    </header>
+
+    <div class="main-container room-container">
+        <div class="top-bar">
+            <!-- 回登入頁（保留 username 會在 room.js 裡處理） -->
+            <a href="../login/login.html" class="back-link-icon" aria-label="返回主頁">
+                ⬅️
+            </a>
+            <div class="ribbon-title">邀請朋友</div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- 上半：顯示自己的房間代碼，可複製 -->
+            <section class="room-panel create-room-panel">
+                <h2 class="panel-title">🚪 你的房間代碼：</h2>
+                <div class="invite-code-display" id="inviteCodeDisplay">
+                    ----
+                </div>
+
+                <p class="panel-subtitle">分享此代碼，邀請朋友加入房間</p>
+            
+                <button class="copy-button" id="copyButton">
+                    📋 複製代碼
+                </button>
+            </section>
+
+            <!-- 下半：輸入代碼加入房間 -->
+            <section class="room-panel join-room-panel">
+                <h2 class="panel-title join-title">🔑 輸入邀請碼加入：</h2>
+
+                <!-- 這個 form 我們會用 JS 攔截，不直接用原本的 action -->
+                <form class="join-form" id="joinForm" action="../lobby/lobby.html" method="GET">
+                    <!-- 隱藏欄位：帶 username / userId 去 lobby -->
+                    <input type="hidden" id="joinUsername" name="username" value="">
+                    <input type="hidden" id="joinUserId" name="userId" value="">
+
+                    <div class="code-input-wrapper">
+                        <!-- 注意 name 改成 roomID，統一參數名稱 -->
+                        <input
+                            type="text"
+                            id="joinCode"
+                            name="roomID"
+                            maxlength="4"
+                            placeholder="輸入 4 位代碼"
+                            required
+                        >
+                    </div>
+
+                    <button class="join-button" type="submit">加入房間</button>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <script src="room.js"></script>
+</body>
+</html>

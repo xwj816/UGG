@@ -76,16 +76,54 @@ function initGame() {
 }
 
 // ----------------------------------------
-// II. 畫布操作 (Drawer & Socket)
+// II. 畫布操作 (Drawer & Socket) - 支援觸控版
 // ----------------------------------------
+
+// 1. 新增一個函數：統一取得座標 (滑鼠/觸控 都能用)
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    
+    // 計算 CSS 縮放比例 (解決手機螢幕寬度導致的座標偏移)
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    let clientX, clientY;
+
+    if (e.touches && e.touches.length > 0) {
+        // 如果是觸控事件，取第一根手指的位置
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        // 如果是滑鼠事件
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+    };
+}
 
 function initCanvas() {
     canvas = document.getElementById('drawingCanvas');
     ctx = canvas.getContext('2d');
     
-    // 設定畫布尺寸 (使其適應父容器)
+    // 設定畫布尺寸
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+    
+    // 監聽視窗改變大小，重設畫布尺寸 (避免變形)
+    window.addEventListener('resize', () => {
+        // 簡單重設，注意：這會清空當前畫布
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        // 重設後需重新套用畫筆樣式
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = currentSize;
+        ctx.strokeStyle = currentColor;
+    });
     
     // 預設畫筆設定
     ctx.lineJoin = 'round';
@@ -93,15 +131,43 @@ function initCanvas() {
     ctx.lineWidth = currentSize;
     ctx.strokeStyle = currentColor;
 
-    // 畫布事件監聽（只有畫家能觸發）
-    canvas.addEventListener('mousedown', (e) => {
-        if (!IS_DRAWER) return; // 只有畫家才能畫圖
+    // --- 定義事件處理函數 ---
+
+    const startDraw = (e) => {
+        if (!IS_DRAWER) return;
+        // 如果是觸控，阻止默認行為(捲動)
+        if (e.type === 'touchstart') e.preventDefault();
+
         isDrawing = true;
-        [lastX, lastY] = [e.offsetX, e.offsetY];
-    });
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseout', () => isDrawing = false);
+        const pos = getPos(e);
+        [lastX, lastY] = [pos.x, pos.y];
+        
+        // 點一下也要畫一個點
+        draw(e); 
+    };
+
+    const moveDraw = (e) => {
+        if (!IS_DRAWER || !isDrawing) return;
+        if (e.type === 'touchmove') e.preventDefault();
+        
+        draw(e);
+    };
+
+    const endDraw = (e) => {
+        isDrawing = false;
+    };
+
+    // --- 綁定滑鼠事件 ---
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', moveDraw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseout', endDraw);
+
+    // --- 綁定觸控事件 (關鍵) ---
+    // passive: false 允許我們使用 preventDefault() 來阻止捲動
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', moveDraw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
 
     // 清空畫布功能
     document.getElementById('clearCanvas').addEventListener('click', () => {
@@ -114,9 +180,10 @@ function initCanvas() {
 function draw(e) {
     if (!isDrawing) return;
     
-    // 取得新的座標
-    const newX = e.offsetX;
-    const newY = e.offsetY;
+    // 使用 getPos 取得正確座標
+    const pos = getPos(e);
+    const newX = pos.x;
+    const newY = pos.y;
 
     // 在本地畫
     ctx.beginPath();
@@ -141,9 +208,8 @@ function draw(e) {
     [lastX, lastY] = [newX, newY];
 }
 
-// 接收伺服器廣播的繪圖指令
+// 接收伺服器廣播的繪圖指令 (保持不變)
 socket.on('drawing', (data) => {
-    // 重新設定畫筆，繪製線段
     ctx.beginPath();
     ctx.moveTo(data.x0, data.y0);
     ctx.lineTo(data.x1, data.y1);
@@ -152,12 +218,11 @@ socket.on('drawing', (data) => {
     ctx.stroke();
 });
 
-// 接收伺服器廣播的清空指令
+// 接收伺服器廣播的清空指令 (保持不變)
 socket.on('canvasCleared', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     console.log("畫布已清空。");
 });
-
 
 // ----------------------------------------
 // III. 遊戲狀態與 Socket 事件處理

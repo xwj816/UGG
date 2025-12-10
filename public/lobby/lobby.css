@@ -1,307 +1,480 @@
-/* lobby/lobby.css */
+/* 1. 變數定義 (與 login, room 保持一致) */
 :root {
     --gartic-blue: #0087ff;
     --gartic-yellow: #ffde00; 
     --dark-blue: #0056cc;
     --dark-yellow: #f6b500;
     --text-dark: #333;
-    --text-light: #f4f4f4;
-    --panel-bg: #fff;
+    --text-medium: #555;
+    --panel-border: #ccc;
+    --bg-grey: #eee;
+    --danger-red: #ff4b4b;
+    --danger-dark: #cc0000;
+    --card-shadow: 0 8px 0 rgba(0,0,0,0.1), 0 20px 30px rgba(0,0,0,0.1);
 }
 
 body {
-    background-color: var(--gartic-blue);
-    padding: 20px;
+    font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    color: var(--text-dark);
+    background-color: var(--dark-blue);
+    overflow: hidden; 
 }
 
-/* 遊戲整體佈局 (聊天室/分數 + 畫布) */
+.background-pattern {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: -1;
+}
+
 .game-layout {
     display: flex;
     max-width: 1200px;
+    height: 100vh;
     margin: 0 auto;
-    height: calc(100vh - 40px); /* 扣掉 body padding */
+    padding: 20px;
+    box-sizing: border-box;
     gap: 20px;
 }
 
-/* --------------------------- */
-/* 左側欄：聊天室與分數板 */
-/* --------------------------- */
+/* 卡片通用 */
+.panel {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    border: 2px solid var(--dark-blue);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 左側欄 */
 .sidebar {
     width: 300px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    flex-shrink: 0;
 }
 
-.game-header, .score-board, .chat-box {
-    background-color: var(--panel-bg);
-    border-radius: 8px;
+/* 標題卡片 */
+.game-header-panel {
     padding: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-height: auto;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .room-title {
-    color: var(--dark-blue);
-    font-size: 1.5em;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.game-status {
-    background-color: var(--gartic-yellow);
-    padding: 5px;
-    border-radius: 4px;
-    font-weight: bold;
-    color: var(--text-dark);
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.current-word {
-    font-size: 1.1em;
-    font-style: italic;
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
     color: var(--text-medium);
-    text-align: center;
 }
 
-/* 分數板樣式 */
-.score-board h3 {
-    margin-top: 0;
-    color: var(--gartic-blue);
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
+.game-status-badge {
+    background-color: var(--gartic-yellow);
+    color: var(--text-dark);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9em;
+    display: inline-block;
+    border: 2px solid var(--dark-yellow);
+    margin-bottom: 5px;
 }
 
-#playerList {
-    list-style: none;
+.current-word-display {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--dark-blue);
+    margin-top: 5px;
+}
+
+/* 分數板 */
+.score-board-panel {
+    flex: 1;
     padding: 0;
+    border: none;
+}
+
+.score-board-panel h3 {
+    background-color: var(--gartic-blue);
+    color: white;
     margin: 0;
+    padding: 10px;
+    font-size: 1em;
+    text-align: center;
+    border-bottom: 3px solid var(--dark-blue);
+}
+
+.player-list {
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .player-item {
     display: flex;
     justify-content: space-between;
-    padding: 5px 0;
-    font-weight: 500;
-}
-
-.player-item:not(:last-child) {
-    border-bottom: 1px dashed #eee;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border-bottom: 2px solid #eee;
+    align-items: center;
 }
 
 .player-item.self {
-    background-color: var(--gartic-yellow);
-    padding: 5px;
-    margin: 0 -5px;
-    border-radius: 4px;
+    background-color: #fff8c5;
+    border: 2px solid var(--gartic-yellow);
 }
 
-.player-item.drawer .player-name {
+.player-item.drawer .player-name::before {
+    content: '✏️ ';
+}
+
+.player-name {
     font-weight: bold;
-    color: var(--dark-blue);
+    color: var(--text-dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
 }
 
 .score {
+    background-color: var(--dark-blue);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8em;
     font-weight: bold;
 }
 
-/* 聊天室樣式 */
-.chat-box {
-    flex-grow: 1; /* 佔據剩餘空間 */
-    display: flex;
-    flex-direction: column;
+/* 聊天區 */
+.chat-panel {
+    height: 35%;
+    border: none;
 }
 
 .messages {
-    flex-grow: 1;
+    flex: 1;
     overflow-y: auto;
-    max-height: 40vh; /* 限制聊天室高度 */
-    border: 1px solid #ddd;
     padding: 10px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
+    background-color: #f4f4f4;
+    font-size: 0.9em;
 }
 
 .message {
-    margin: 5px 0;
-    line-height: 1.4;
-    word-wrap: break-word;
+    margin: 4px 0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .message .user {
+    color: var(--dark-blue);
     font-weight: bold;
-    color: var(--gartic-blue);
 }
 
 .message.system-message {
-    text-align: center;
+    background: none;
+    box-shadow: none;
+    color: var(--text-light);
     font-style: italic;
-    color: var(--text-medium);
+    text-align: center;
+    font-size: 0.85em;
 }
 
-.chat-input-form {
+.chat-input-wrapper {
     display: flex;
+    padding: 8px;
+    background-color: white;
+    border-top: 1px solid #ddd;
 }
 
 #chatInput {
-    flex-grow: 1;
-    padding: 10px;
-    border: 2px solid var(--gartic-blue);
-    border-radius: 5px 0 0 5px;
-    font-size: 1em;
+    flex: 1;
+    border: 2px solid var(--bg-grey);
+    background-color: var(--bg-grey);
+    border-radius: 20px 0 0 20px;
+    padding: 8px 12px;
+    outline: none;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
-.chat-input-form button {
+#chatInput:focus {
+    border-color: var(--gartic-blue);
+    background-color: white;
+}
+
+.send-btn {
     background-color: var(--gartic-blue);
     color: white;
     border: none;
-    padding: 10px 15px;
+    border-radius: 0 20px 20px 0;
+    padding: 0 15px;
+    font-weight: bold;
     cursor: pointer;
-    border-radius: 0 5px 5px 0;
-    transition: background-color 0.1s;
+    transition: 0.1s;
 }
 
-.chat-input-form button:hover {
+.send-btn:hover {
     background-color: var(--dark-blue);
 }
 
-/* --------------------------- */
-/* 右側：畫布與工具列 */
-/* --------------------------- */
+/* 右側主區域 */
 .drawing-area {
-    flex-grow: 1;
-    background-color: var(--panel-bg);
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
+    flex: 1;
+    padding: 0;
+    position: relative;
+    border: 3px solid white;
+    background-color: var(--bg-grey);
 }
 
 .toolbar {
     display: flex;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
     align-items: center;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background-color: white;
+    border-bottom: 2px solid #ddd;
 }
 
-.tool-button, .special-button {
-    background-color: var(--text-light);
-    color: white;
-    border: none;
+.tool-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* 3D 按鈕 */
+.tool-button, .modal-btn {
+    background-color: white;
+    border: 2px solid var(--panel-border);
+    box-shadow: 0 3px 0 var(--panel-border);
+    border-radius: 8px;
     padding: 8px 12px;
+    font-size: 1.2em;
     cursor: pointer;
-    border-radius: 5px;
     transition: all 0.1s;
-    font-weight: bold;
-}
-
-.tool-button.active, .tool-button:hover:not(:disabled) {
-    background-color: var(--gartic-blue);
-    box-shadow: 0 2px 0 var(--dark-blue);
     position: relative;
-    top: -1px;
+    top: 0;
 }
 
-.tool-button:disabled {
-    cursor: not-allowed;
-    background-color: #eee;
-    color: var(--text-light);
+.tool-button:hover:not(:disabled) {
+    top: 2px;
+    box-shadow: 0 1px 0 var(--panel-border);
+    background-color: #f9f9f9;
+}
+
+.tool-button:active:not(:disabled) {
+    top: 3px;
     box-shadow: none;
 }
 
-.special-button {
+.tool-button.active {
+    background-color: var(--gartic-blue);
+    border-color: var(--dark-blue);
+    box-shadow: 0 3px 0 var(--dark-blue);
+    color: white;
+}
+
+.tool-button.danger:hover {
+    background-color: var(--danger-red);
+    border-color: var(--danger-dark);
+    box-shadow: 0 1px 0 var(--danger-dark);
+    color: white;
+}
+
+/* 黃色特殊按鈕 */
+.special-button, .modal-btn {
     background-color: var(--gartic-yellow);
-    color: var(--text-dark);
+    border: 2px solid var(--dark-yellow);
     box-shadow: 0 3px 0 var(--dark-yellow);
+    color: var(--text-dark);
+    font-weight: bold;
+    font-size: 1em;
 }
 
-.special-button:hover {
+.special-button:hover, .modal-btn:hover {
     background-color: #ffc400;
+    box-shadow: 0 1px 0 var(--dark-yellow);
+    top: 2px;
 }
 
-.color-picker {
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: none;
+/* --- 色票樣式 --- */
+.color-palette {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+}
+
+.color-swatch {
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    overflow: hidden;
     cursor: pointer;
+    border: 2px solid rgba(0,0,0,0.1);
+    transition: transform 0.1s, border-color 0.1s;
+    position: relative;
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+    border-color: rgba(0,0,0,0.3);
+}
+
+.color-swatch.active {
+    transform: scale(1.1);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--text-dark); /* 模擬雙層邊框 */
+    z-index: 1;
 }
 
 .size-slider {
-    width: 80px;
+    width: 100px;
     cursor: pointer;
 }
 
-/* 畫布本身 */
-#drawingCanvas {
-    flex-grow: 1; /* 佔據所有剩餘空間 */
+/* 畫布 */
+.canvas-wrapper {
+    flex: 1;
     background-color: white;
-    border: 1px solid #ccc;
-    cursor: crosshair; /* 畫筆游標 */
-    width: 100%; /* 確保寬度填滿 */
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-    touch-action: none; /* 禁用觸控滾動 */
+    cursor: crosshair;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* --------------------------- */
-/* 彈出視窗 (Modal) 樣式 */
-/* --------------------------- */
+#drawingCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Modal */
 .modal {
-    display: none; /* 預設隱藏 */
-    position: fixed;
+    display: none;
+    position: absolute;
     z-index: 100;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.6); /* 黑色半透明背景 */
-    backdrop-filter: blur(3px);
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
-    background-color: var(--panel-bg);
-    margin: 15% auto; /* 距頂部 15% */
-    padding: 20px;
-    border: 5px solid var(--gartic-blue);
-    width: 80%;
-    max-width: 400px;
+    background-color: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 300px;
     text-align: center;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 4px solid var(--gartic-blue);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
 .modal-content h3 {
     color: var(--gartic-blue);
     margin-top: 0;
-    border-bottom: 2px solid var(--gartic-yellow);
-    padding-bottom: 10px;
+    font-size: 1.5em;
 }
 
 #wordInput {
-    width: 90%;
+    width: 80%;
     padding: 10px;
-    margin-bottom: 15px;
+    margin: 15px 0;
     border: 2px solid var(--panel-border);
-    border-radius: 5px;
-    font-size: 1.1em;
+    border-radius: 8px;
+    font-size: 1.2em;
+    text-align: center;
+    outline: none;
 }
 
-.modal-content .special-button {
-    background-color: var(--gartic-blue);
-    color: white;
-    border: 3px solid var(--dark-blue);
-    box-shadow: 0 4px 0 var(--dark-blue);
-    font-size: 1.1em;
-    padding: 10px 20px;
+#wordInput:focus {
+    border-color: var(--gartic-blue);
 }
 
-.modal-content .special-button:hover {
-    box-shadow: 0 2px 0 var(--dark-blue);
-    top: 2px;
+.modal-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* RWD */
+@media (max-width: 768px) {
+    .game-layout {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        padding: 10px;
+    }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .game-header-panel, .score-board-panel, .chat-panel {
+        width: 100%;
+    }
+    .drawing-area {
+        height: 50vh;
+    }
+    
+    /* 色票在手機版折行 */
+    .color-swatch {
+        width: 20px;
+        height: 20px;
+    }
+    .color-palette {
+        gap: 3px;
+        flex-wrap: wrap;
+        max-width: 150px;
+        justify-content: center;
+    }
+
+    /* 新增：計時器樣式 */
+    .timer-container {
+        width: 100%;
+        height: 10px;
+        background-color: #eee;
+        border-radius: 5px;
+        margin: 10px 0;
+        overflow: hidden;
+        border: 1px solid #ccc;
+    }
+
+    .timer-bar {
+        width: 100%; /* 初始滿的 */
+        height: 100%;
+        background-color: var(--gartic-blue); /* 倒數時變成紅色 */
+        transition: width 1s linear, background-color 1s;
+    }
+
+    /* 狀態為 "hasGuessed" (打勾) 的樣式 */
+    .player-item.guessed {
+        background-color: #d4edda; /* 淺綠色 */
+        border-color: #c3e6cb;
+    }
+    .player-item.guessed .player-name::after {
+        content: ' ✅';
+    }
 }

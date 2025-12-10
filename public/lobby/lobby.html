@@ -4,62 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>你猜猜 - 遊戲中</title>
-    <link rel="stylesheet" href="../css/base.css"> 
     <link rel="stylesheet" href="lobby.css">
 </head>
 <body>
+    <div class="background-pattern"></div>
+
     <div class="game-layout">
         
         <aside class="sidebar">
-            <header class="game-header">
+            <section class="panel game-header-panel">
                 <h2 id="roomTitle" class="room-title">房間：----</h2>
-                <div class="game-status" id="gameStatus">等待畫家出題...</div>
-                <div class="current-word" id="currentWordDisplay">
-                    答案/字數提示
+                
+                <div class="timer-container">
+                    <div id="timerBar" class="timer-bar"></div>
                 </div>
-            </header>
-
-            <section class="score-board">
-                <h3>🏆 玩家分數</h3>
-                <ul id="playerList">
-                    <li class="player-item">玩家A <span class="score">0</span></li>
-                </ul>
+                <div class="game-status-badge" id="gameStatus">等待遊戲開始...</div>
+                
+                <div class="current-word-display" id="currentWordDisplay">--</div>
             </section>
 
-            <section class="chat-box">
-                <div class="messages" id="messages">
-                    </div>
-                <form id="guessForm" class="chat-input-form">
-                    <input type="text" id="chatInput" placeholder="輸入猜測 / 訊息..." autocomplete="off">
-                    <button type="submit">送出</button>
+            <section class="panel score-board-panel">
+                <h3>🏆 玩家排行</h3>
+                <ul id="playerList" class="player-list">
+                    </ul>
+            </section>
+
+            <section class="panel chat-panel">
+                <div class="messages" id="messages"></div>
+                <form id="guessForm" class="chat-input-wrapper">
+                    <input type="text" id="chatInput" placeholder="輸入答案..." autocomplete="off">
+                    <button type="submit" class="send-btn">送出</button>
                 </form>
             </section>
         </aside>
 
-        <main class="drawing-area">
+        <main class="drawing-area panel">
             <div class="toolbar">
-                <button id="toolPen" class="tool-button active" data-tool="pen">✏️</button>
-                <button id="toolEraser" class="tool-button" data-tool="eraser">🧽</button>
-                <input type="color" id="colorPicker" value="#000000" class="color-picker">
-                <input type="range" id="sizeSlider" min="1" max="50" value="5" class="size-slider">
-                <button id="clearCanvas" class="tool-button">🧹 清空</button>
-                <button id="startRoundButton" class="tool-button special-button">
-                    開始回合 (畫家專屬)
-                </button>
+                <div class="tool-group">
+                    <button id="toolPen" class="tool-button active" data-tool="pen" title="畫筆">✏️</button>
+                    <button id="toolEraser" class="tool-button" data-tool="eraser" title="橡皮擦">🧽</button>
+                    <button id="clearCanvas" class="tool-button danger" title="清空">🧹</button>
+                </div>
+                
+                <div class="tool-group settings">
+                    <div id="colorPalette" class="color-palette"></div>
+                    <input type="range" id="sizeSlider" min="1" max="50" value="5" class="size-slider" title="粗細">
+                </div>
+
+                <div class="tool-group action">
+                    <button id="startRoundButton" class="tool-button special-button" style="display:none;">
+                        開始回合
+                    </button>
+                </div>
             </div>
 
-            <canvas id="drawingCanvas"></canvas>
+            <div class="canvas-wrapper">
+                <canvas id="drawingCanvas"></canvas>
+            </div>
             
             <div id="wordModal" class="modal">
                 <div class="modal-content">
-                    <h3>請為這回合出題！</h3>
+                    <h3>🎨 輪到你畫了！</h3>
+                    <p>請輸入一個詞彙讓大家猜：</p>
                     <form id="wordForm">
-                        <input type="text" id="wordInput" placeholder="輸入你要畫的詞彙" required maxlength="15">
-                        <button type="submit" class="special-button">確認出題</button>
+                        <input type="text" id="wordInput" placeholder="例如：蘋果" required maxlength="15">
+                        <button type="submit" class="modal-btn">確認出題</button>
                     </form>
                 </div>
             </div>
-            
         </main>
     </div>
 

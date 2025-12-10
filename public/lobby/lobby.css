@@ -1,4 +1,5 @@
-/* 1. 變數定義 (與 login, room 保持一致) */
+/* lobby/lobby.css - 完整版 (含計分與計時器樣式) */
+
 :root {
     --gartic-blue: #0087ff;
     --gartic-yellow: #ffde00; 
@@ -19,7 +20,7 @@ body {
     padding: 0;
     height: 100vh;
     color: var(--text-dark);
-    background-color: var(--dark-blue);
+    background-color: var(--gartic-blue);
     overflow: hidden; 
 }
 
@@ -141,6 +142,15 @@ body {
 
 .player-item.drawer .player-name::before {
     content: '✏️ ';
+}
+
+/* ★★★ 新增：猜對狀態 ★★★ */
+.player-item.guessed {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.player-item.guessed .player-name::after {
+    content: ' ✅';
 }
 
 .player-name {
@@ -314,7 +324,7 @@ body {
     top: 2px;
 }
 
-/* --- 色票樣式 --- */
+/* 色票樣式 */
 .color-palette {
     display: flex;
     gap: 5px;
@@ -343,7 +353,7 @@ body {
 .color-swatch.active {
     transform: scale(1.1);
     border: 2px solid white;
-    box-shadow: 0 0 0 2px var(--text-dark); /* 模擬雙層邊框 */
+    box-shadow: 0 0 0 2px var(--text-dark);
     z-index: 1;
 }
 
@@ -419,6 +429,24 @@ body {
     margin-top: 10px;
 }
 
+/* ★★★ 新增：計時器樣式 ★★★ */
+.timer-container {
+    width: 100%;
+    height: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+    margin: 10px 0;
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+.timer-bar {
+    width: 100%; /* 初始滿的 */
+    height: 100%;
+    background-color: var(--gartic-blue);
+    transition: width 1s linear, background-color 1s;
+}
+
 /* RWD */
 @media (max-width: 768px) {
     .game-layout {
@@ -438,8 +466,6 @@ body {
     .drawing-area {
         height: 50vh;
     }
-    
-    /* 色票在手機版折行 */
     .color-swatch {
         width: 20px;
         height: 20px;
@@ -449,32 +475,5 @@ body {
         flex-wrap: wrap;
         max-width: 150px;
         justify-content: center;
-    }
-
-    /* 新增：計時器樣式 */
-    .timer-container {
-        width: 100%;
-        height: 10px;
-        background-color: #eee;
-        border-radius: 5px;
-        margin: 10px 0;
-        overflow: hidden;
-        border: 1px solid #ccc;
-    }
-
-    .timer-bar {
-        width: 100%; /* 初始滿的 */
-        height: 100%;
-        background-color: var(--gartic-blue); /* 倒數時變成紅色 */
-        transition: width 1s linear, background-color 1s;
-    }
-
-    /* 狀態為 "hasGuessed" (打勾) 的樣式 */
-    .player-item.guessed {
-        background-color: #d4edda; /* 淺綠色 */
-        border-color: #c3e6cb;
-    }
-    .player-item.guessed .player-name::after {
-        content: ' ✅';
     }
 }

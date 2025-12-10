@@ -1,4 +1,5 @@
-// lobby/lobby.js - 完整版 (含計分與計時器)
+// lobby/lobby.js - 完整版
+
 const socket = io(); 
 
 // --- 全域變數 ---
@@ -35,10 +36,10 @@ const els = {
     playerList: document.getElementById('playerList'),
     startRoundBtn: document.getElementById('startRoundButton'),
     roomTitle: document.getElementById('roomTitle'),
-    timerBar: document.getElementById('timerBar') // 新增
+    timerBar: document.getElementById('timerBar') // 必須與 HTML ID 對應
 };
 
-// ... (initGame, getUrlParams, initColorPalette, selectColor 保持不變) ...
+// ... (Get Url Params & Init Game) ...
 
 function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
@@ -102,7 +103,7 @@ function selectColor(color) {
     if(penBtn) penBtn.classList.add('active');
 }
 
-// ... (initCanvas, draw 保持不變) ...
+// ... (Canvas Logic) ...
 function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -200,7 +201,6 @@ function setupEventListeners() {
 
 // --- Socket 狀態更新 ---
 
-// 更新分數板 (支援顯示 "已猜對" 狀態)
 function updateScoreboard(scores, playerMap, currentDrawerSocketId) {
     els.playerList.innerHTML = '';
     const sortedPlayers = Object.values(playerMap)
@@ -210,7 +210,7 @@ function updateScoreboard(scores, playerMap, currentDrawerSocketId) {
         const score = scores[p.userId] || 0;
         const isSelf = p.userId === USER_ID;
         const isDrawer = p.socketId === currentDrawerSocketId;
-        const hasGuessed = p.hasGuessed; // 從後端傳來的狀態
+        const hasGuessed = p.hasGuessed; 
         
         const li = document.createElement('li');
         li.className = `player-item ${isSelf ? 'self' : ''} ${isDrawer ? 'drawer' : ''} ${hasGuessed ? 'guessed' : ''}`;
@@ -238,13 +238,12 @@ function toggleDrawerControls(isDrawer) {
     });
 }
 
-// ★★★ 接收時間更新 ★★★
+// ★★★ 接收時間更新：會移動計時條 ★★★
 socket.on('timerUpdate', ({ timeLeft, total }) => {
     if (!els.timerBar) return;
     const percent = (timeLeft / total) * 100;
     els.timerBar.style.width = `${percent}%`;
     
-    // 時間少於 20% 變紅色，否則藍色
     if (percent < 20) {
         els.timerBar.style.backgroundColor = 'var(--danger-red)';
     } else {
@@ -283,14 +282,12 @@ socket.on('roundStartedForDrawer', ({ word }) => {
 });
 
 socket.on('roundEnded', ({ winnerUserId, answer, reason }) => {
-    // 顯示結束原因 (時間到 or 猜對了)
     els.gameStatus.textContent = reason ? `${reason} 答案：${answer}` : `答案揭曉：${answer}`;
     els.currentWordDisplay.textContent = '回合結束';
     
     toggleDrawerControls(false);
     els.startRoundBtn.style.display = 'none';
     
-    // 重置計時條
     if(els.timerBar) els.timerBar.style.width = '0%';
 });
 
@@ -299,7 +296,6 @@ socket.on('nextDrawer', ({ drawerSocketId, drawerNickname }) => {
     els.gameStatus.textContent = isMe ? '輪到你了！請出題' : `請 ${drawerNickname} 出題`;
     els.currentWordDisplay.textContent = '準備中...';
     
-    // 重置計時條
     if(els.timerBar) {
         els.timerBar.style.width = '100%';
         els.timerBar.style.backgroundColor = 'var(--gartic-blue)';

@@ -1,5 +1,4 @@
-// lobby/lobby.js - 完整版
-
+// lobby/lobby.js - 修正分數與計時條顯示
 const socket = io(); 
 
 // --- 全域變數 ---
@@ -17,13 +16,11 @@ let currentColor = '#000000';
 let currentSize = 5;
 let currentTool = 'pen'; 
 
-// 色票
 const COLORS = [
     '#000000', '#555555', '#ffffff', '#ff0000', '#ff7f00', '#ffff00', 
     '#00ff00', '#00ffff', '#0000ff', '#9b00ff', '#ff69b4', '#8b4513'
 ];
 
-// --- DOM 元素 ---
 const els = {
     messages: document.getElementById('messages'),
     chatInput: document.getElementById('chatInput'),
@@ -36,10 +33,8 @@ const els = {
     playerList: document.getElementById('playerList'),
     startRoundBtn: document.getElementById('startRoundButton'),
     roomTitle: document.getElementById('roomTitle'),
-    timerBar: document.getElementById('timerBar') // 必須與 HTML ID 對應
+    timerBar: document.getElementById('timerBar') // 必須與 HTML 對應
 };
-
-// ... (Get Url Params & Init Game) ...
 
 function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
@@ -103,7 +98,6 @@ function selectColor(color) {
     if(penBtn) penBtn.classList.add('active');
 }
 
-// ... (Canvas Logic) ...
 function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -161,7 +155,6 @@ socket.on('drawing', (data) => {
 });
 socket.on('canvasCleared', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
 
-// --- 事件監聽 ---
 function setupEventListeners() {
     els.guessForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -171,7 +164,6 @@ function setupEventListeners() {
             els.chatInput.value = '';
         }
     });
-
     els.wordForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const word = els.wordInput.value.trim();
@@ -181,7 +173,6 @@ function setupEventListeners() {
             els.wordInput.value = '';
         }
     });
-
     document.querySelectorAll('.tool-button').forEach(btn => {
         if (!btn.dataset.tool) return;
         btn.addEventListener('click', (e) => {
@@ -194,19 +185,19 @@ function setupEventListeners() {
             }
         });
     });
-
     document.getElementById('sizeSlider').addEventListener('input', (e) => currentSize = parseInt(e.target.value));
     els.startRoundBtn.addEventListener('click', () => { if (IS_DRAWER) els.wordModal.style.display = 'block'; });
 }
 
-// --- Socket 狀態更新 ---
-
+// ★★★ 關鍵函式：更新分數板 ★★★
 function updateScoreboard(scores, playerMap, currentDrawerSocketId) {
     els.playerList.innerHTML = '';
+    // 將 Map 轉為 Array，並依照分數排序
     const sortedPlayers = Object.values(playerMap)
         .sort((a, b) => (scores[b.userId] || 0) - (scores[a.userId] || 0));
 
     sortedPlayers.forEach(p => {
+        // 現在 p.userId 是存在的，所以可以正確查到分數
         const score = scores[p.userId] || 0;
         const isSelf = p.userId === USER_ID;
         const isDrawer = p.socketId === currentDrawerSocketId;
@@ -238,12 +229,11 @@ function toggleDrawerControls(isDrawer) {
     });
 }
 
-// ★★★ 接收時間更新：會移動計時條 ★★★
+// 接收時間更新：移動計時條
 socket.on('timerUpdate', ({ timeLeft, total }) => {
     if (!els.timerBar) return;
     const percent = (timeLeft / total) * 100;
     els.timerBar.style.width = `${percent}%`;
-    
     if (percent < 20) {
         els.timerBar.style.backgroundColor = 'var(--danger-red)';
     } else {
@@ -284,10 +274,8 @@ socket.on('roundStartedForDrawer', ({ word }) => {
 socket.on('roundEnded', ({ winnerUserId, answer, reason }) => {
     els.gameStatus.textContent = reason ? `${reason} 答案：${answer}` : `答案揭曉：${answer}`;
     els.currentWordDisplay.textContent = '回合結束';
-    
     toggleDrawerControls(false);
     els.startRoundBtn.style.display = 'none';
-    
     if(els.timerBar) els.timerBar.style.width = '0%';
 });
 
@@ -295,12 +283,10 @@ socket.on('nextDrawer', ({ drawerSocketId, drawerNickname }) => {
     const isMe = socket.id === drawerSocketId;
     els.gameStatus.textContent = isMe ? '輪到你了！請出題' : `請 ${drawerNickname} 出題`;
     els.currentWordDisplay.textContent = '準備中...';
-    
     if(els.timerBar) {
         els.timerBar.style.width = '100%';
         els.timerBar.style.backgroundColor = 'var(--gartic-blue)';
     }
-
     if (isMe) {
         toggleDrawerControls(true);
         els.startRoundBtn.style.display = 'inline-block'; 

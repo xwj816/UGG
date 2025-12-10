@@ -1,3 +1,6 @@
+/* room/room.css - 手機適配版 */
+
+/* ... (保留 :root, body, background-pattern) ... */
 :root {
     --gartic-blue: #0087ff;
     --gartic-yellow: #ffde00; 
@@ -36,10 +39,10 @@ body {
     z-index: -1;
 }
 
-/* Header (與 login 一致) */
+/* ... (Header 樣式同 login.css) ... */
 .main-header {
     position: absolute;
-    top: 30px;
+    top: 20px;
     width: 90%;
     max-width: 450px;
     display: flex;
@@ -48,7 +51,6 @@ body {
     color: white;
     z-index: 10;
 }
-
 .logo {
     font-size: 2.5em;
     font-weight: 900;
@@ -56,7 +58,6 @@ body {
     letter-spacing: -1px;
     margin: 0;
 }
-
 .user-display {
     display: flex;
     align-items: center;
@@ -65,7 +66,6 @@ body {
     padding: 5px 10px;
     border-radius: 20px;
 }
-
 .avatar-sm {
     width: 28px;
     height: 28px;
@@ -78,9 +78,9 @@ body {
     justify-content: center;
 }
 
-/* 主容器 (與 login 一致) */
+/* 主容器：RWD 修正 */
 .main-container {
-    width: 90%;
+    width: 90%; /* 手機上佔 90% */
     max-width: 400px; 
     background-color: white;
     border-radius: 20px;
@@ -91,6 +91,7 @@ body {
     position: relative;
     text-align: center; 
     border: 4px solid rgba(255,255,255,0.3);
+    box-sizing: border-box;
 }
 
 .top-bar {
@@ -99,14 +100,13 @@ body {
     height: 20px;
 }
 
-/* 緞帶 */
 .ribbon-title {
     display: inline-block;
     background-color: var(--gartic-blue);
     color: white;
     font-size: 1.5em;
     font-weight: bold;
-    padding: 8px 30px 8px 45px; /* 左邊留空間給返回鍵 */
+    padding: 8px 30px 8px 45px;
     border-radius: 8px;
     position: relative;
     top: -20px; 
@@ -114,9 +114,9 @@ body {
     box-shadow: 0 5px 0 var(--dark-blue);
     border: 2px solid white;
     z-index: 5;
+    white-space: nowrap; /* 防止標題換行 */
 }
 
-/* 返回按鈕 (圓形 3D) */
 .back-link-icon {
     position: absolute;
     z-index: 10;
@@ -136,20 +136,18 @@ body {
     cursor: pointer;
     box-shadow: 0 3px 0 var(--gartic-yellow);
     transition: all 0.1s;
+    touch-action: manipulation;
 }
-
 .back-link-icon:hover {
     top: -7px;
     box-shadow: 0 5px 0 var(--gartic-yellow);
-    background-color: #fffbef;
 }
-
 .back-link-icon:active {
     top: -2px;
     box-shadow: none;
 }
 
-/* 內容 */
+/* 內容區塊 */
 .content-wrapper {
     display: flex;
     flex-direction: column;
@@ -173,7 +171,7 @@ body {
     opacity: 0.8;
 }
 
-/* 代碼顯示框 */
+/* 代碼顯示：手機字體縮小 */
 .invite-code-display {
     font-size: 2.2em;
     font-weight: bold;
@@ -188,36 +186,37 @@ body {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 15px;
+    word-break: break-all; /* 防止代碼溢出 */
 }
 
-/* 複製按鈕 (黃色 3D) */
+@media (max-width: 400px) {
+    .invite-code-display { font-size: 1.8em; }
+}
+
 .copy-button {
     background-color: var(--gartic-yellow);
     color: var(--text-dark);
     border: 2px solid var(--dark-yellow); 
     font-size: 1.1em;
     font-weight: bold;
-    padding: 10px 30px;
+    padding: 12px 30px; /* 加大觸控區 */
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.1s;
     box-shadow: 0 4px 0 var(--dark-yellow);
     display: inline-block;
     width: 80%;
+    touch-action: manipulation;
 }
-
 .copy-button:hover {
     top: 2px;
     box-shadow: 0 2px 0 var(--dark-yellow);
-    filter: brightness(1.05);
 }
-
 .copy-button:active {
     top: 4px;
     box-shadow: none;
 }
 
-/* 加入輸入框 (與 Login 一致) */
 .code-input-wrapper {
     background-color: var(--bg-grey);
     border: 3px solid #ddd;
@@ -226,7 +225,6 @@ body {
     margin-bottom: 15px;
     transition: 0.2s;
 }
-
 .code-input-wrapper:focus-within {
     border-color: var(--gartic-blue);
     background-color: white;
@@ -247,7 +245,6 @@ body {
     color: var(--text-dark);
 }
 
-/* 加入按鈕 (藍色 3D) */
 .join-button {
     background-color: var(--gartic-blue);
     color: white;
@@ -263,19 +260,15 @@ body {
     display: block;
     position: relative;
     top: 0;
+    touch-action: manipulation;
 }
-
 .join-button:hover {
     top: 2px;
     box-shadow: 0 2px 0 var(--dark-blue);
-    background-color: #1a90ff;
 }
-
 .join-button:active {
     top: 4px;
     box-shadow: none;
 }
 
-.download-section, .login-prompt, .social-login, .game-stats-panel, .main-footer {
-    display: none;
-}
+.download-section, .login-prompt, .social-login, .game-stats-panel, .main-footer { display: none; }

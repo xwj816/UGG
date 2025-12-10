@@ -1,4 +1,4 @@
-// lobby/lobby.js - 修正分數與計時條顯示
+// lobby/lobby.js - 畫布全螢幕修正版
 const socket = io(); 
 
 // --- 全域變數 ---
@@ -33,7 +33,7 @@ const els = {
     playerList: document.getElementById('playerList'),
     startRoundBtn: document.getElementById('startRoundButton'),
     roomTitle: document.getElementById('roomTitle'),
-    timerBar: document.getElementById('timerBar') // 必須與 HTML 對應
+    timerBar: document.getElementById('timerBar') 
 };
 
 function getUrlParams() {
@@ -58,7 +58,11 @@ function initGame() {
     if (els.roomTitle) els.roomTitle.textContent = `房間：${ROOM_ID}`;
     socket.emit('joinRoom', { roomId: ROOM_ID, userId: USER_ID, nickname: USERNAME });
 
-    initCanvas();
+    // 延遲執行確保 DOM 已經 render 完畢
+    setTimeout(() => {
+        initCanvas();
+    }, 200);
+
     setupEventListeners();
     initColorPalette();
 
@@ -98,37 +102,106 @@ function selectColor(color) {
     if(penBtn) penBtn.classList.add('active');
 }
 
+// ★★★ 畫布座標修正 ★★★
 function getPos(e) {
+    // 獲取畫布在螢幕上的位置和尺寸
     const rect = canvas.getBoundingClientRect();
+    
+    // 計算比例 (雖然我們強制設為 1:1，但加這層保險更安全)
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    let clientX = e.clientX, clientY = e.clientY;
+
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+
     if (e.touches && e.touches.length > 0) {
         clientX = e.touches[0].clientX;
         clientY = e.touches[0].clientY;
     }
-    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+    };
 }
 
 function initCanvas() {
     canvas = document.getElementById('drawingCanvas');
     ctx = canvas.getContext('2d');
+    
+    // ★★★ 強制調整畫布解析度 ★★★
     const resizeCanvas = () => {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-        ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-        ctx.lineWidth = currentSize; ctx.strokeStyle = currentColor;
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+        // 找到父容器 (.canvas-wrapper)
+        const parent = canvas.parentElement;
+        
+        // 取得父容器的實際寬高
+        const w = parent.clientWidth;
+        const h = parent.clientHeight;
 
-    const startDraw = (e) => { if (IS_DRAWER) { if(e.type==='touchstart')e.preventDefault(); isDrawing=true; const p=getPos(e); lastX=p.x; lastY=p.y; draw(e); }};
-    const moveDraw = (e) => { if (IS_DRAWER && isDrawing) { if(e.type==='touchmove')e.preventDefault(); draw(e); }};
+        // 如果尺寸有變才更新，避免手機鍵盤彈出時重置
+        if (canvas.width !== w || canvas.height !== h) {
+            // 暫存畫面
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            // 只在有內容時備份
+            if(canvas.width > 0 && canvas.height > 0) {
+                tempCtx.drawImage(canvas, 0, 0);
+            }
+
+            // 更新畫布內部解析度
+            canvas.width = w;
+            canvas.height = h;
+
+            // 還原畫面 (拉伸)
+            if(tempCanvas.width > 0 && tempCanvas.height > 0) {
+                 ctx.drawImage(tempCanvas, 0, 0, w, h);
+            }
+
+            // 重設筆刷
+            ctx.lineJoin = 'round'; 
+            ctx.lineCap = 'round';
+            ctx.lineWidth = currentSize; 
+            ctx.strokeStyle = currentColor;
+        }
+    };
+    
+    // 初始化執行一次
+    resizeCanvas();
+
+    // 監聽視窗變動
+    window.addEventListener('resize', () => {
+        setTimeout(resizeCanvas, 100);
+    });
+
+    const startDraw = (e) => { 
+        if (!IS_DRAWER) return; 
+        if(e.type==='touchstart') e.preventDefault(); 
+        
+        isDrawing = true; 
+        const p = getPos(e); 
+        lastX = p.x; 
+        lastY = p.y; 
+        draw(e); 
+    };
+
+    const moveDraw = (e) => { 
+        if (!IS_DRAWER || !isDrawing) return; 
+        if(e.type==='touchmove') e.preventDefault(); 
+        
+        draw(e); 
+    };
+
     const endDraw = () => { isDrawing = false; };
 
-    canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', moveDraw);
-    canvas.addEventListener('mouseup', endDraw); canvas.addEventListener('mouseout', endDraw);
-    canvas.addEventListener('touchstart', startDraw, {passive:false}); canvas.addEventListener('touchmove', moveDraw, {passive:false});
+    canvas.addEventListener('mousedown', startDraw); 
+    canvas.addEventListener('mousemove', moveDraw);
+    canvas.addEventListener('mouseup', endDraw); 
+    canvas.addEventListener('mouseout', endDraw);
+
+    canvas.addEventListener('touchstart', startDraw, {passive:false}); 
+    canvas.addEventListener('touchmove', moveDraw, {passive:false});
     canvas.addEventListener('touchend', endDraw);
 
     document.getElementById('clearCanvas').addEventListener('click', () => {
@@ -141,18 +214,40 @@ function initCanvas() {
 function draw(e) {
     if (!isDrawing) return;
     const pos = getPos(e);
-    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(pos.x, pos.y);
+    
+    ctx.beginPath(); 
+    ctx.moveTo(lastX, lastY); 
+    ctx.lineTo(pos.x, pos.y);
     ctx.strokeStyle = (currentTool === 'pen') ? currentColor : '#FFFFFF';
-    ctx.lineWidth = currentSize; ctx.stroke();
-    socket.emit('drawing', { roomId: ROOM_ID, x0: lastX, y0: lastY, x1: pos.x, y1: pos.y, color: currentColor, size: currentSize, tool: currentTool });
+    ctx.lineWidth = currentSize; 
+    ctx.stroke();
+    
+    socket.emit('drawing', { 
+        roomId: ROOM_ID, 
+        x0: lastX, y0: lastY, 
+        x1: pos.x, y1: pos.y, 
+        color: currentColor, 
+        size: currentSize, 
+        tool: currentTool,
+        w: canvas.width, // 傳送畫布寬度供比例換算
+        h: canvas.height
+    });
+
     lastX = pos.x; lastY = pos.y;
 }
 
 socket.on('drawing', (data) => {
-    ctx.beginPath(); ctx.moveTo(data.x0, data.y0); ctx.lineTo(data.x1, data.y1);
+    // 接收時不需複雜換算，因為 resizeCanvas 會負責讓畫面充滿
+    ctx.beginPath(); 
+    ctx.moveTo(data.x0, data.y0); 
+    ctx.lineTo(data.x1, data.y1);
     ctx.strokeStyle = (data.tool === 'pen') ? data.color : '#FFFFFF';
-    ctx.lineWidth = data.size; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+    ctx.lineWidth = data.size; 
+    ctx.lineJoin = 'round'; 
+    ctx.lineCap = 'round'; 
+    ctx.stroke();
 });
+
 socket.on('canvasCleared', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
 
 function setupEventListeners() {
@@ -162,8 +257,10 @@ function setupEventListeners() {
         if (text) {
             socket.emit('guess', { roomId: ROOM_ID, text: text });
             els.chatInput.value = '';
+            els.chatInput.blur(); // 手機收鍵盤
         }
     });
+
     els.wordForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const word = els.wordInput.value.trim();
@@ -173,6 +270,7 @@ function setupEventListeners() {
             els.wordInput.value = '';
         }
     });
+
     document.querySelectorAll('.tool-button').forEach(btn => {
         if (!btn.dataset.tool) return;
         btn.addEventListener('click', (e) => {
@@ -185,19 +283,17 @@ function setupEventListeners() {
             }
         });
     });
+
     document.getElementById('sizeSlider').addEventListener('input', (e) => currentSize = parseInt(e.target.value));
     els.startRoundBtn.addEventListener('click', () => { if (IS_DRAWER) els.wordModal.style.display = 'block'; });
 }
 
-// ★★★ 關鍵函式：更新分數板 ★★★
 function updateScoreboard(scores, playerMap, currentDrawerSocketId) {
     els.playerList.innerHTML = '';
-    // 將 Map 轉為 Array，並依照分數排序
     const sortedPlayers = Object.values(playerMap)
         .sort((a, b) => (scores[b.userId] || 0) - (scores[a.userId] || 0));
 
     sortedPlayers.forEach(p => {
-        // 現在 p.userId 是存在的，所以可以正確查到分數
         const score = scores[p.userId] || 0;
         const isSelf = p.userId === USER_ID;
         const isDrawer = p.socketId === currentDrawerSocketId;
@@ -229,16 +325,12 @@ function toggleDrawerControls(isDrawer) {
     });
 }
 
-// 接收時間更新：移動計時條
 socket.on('timerUpdate', ({ timeLeft, total }) => {
     if (!els.timerBar) return;
     const percent = (timeLeft / total) * 100;
     els.timerBar.style.width = `${percent}%`;
-    if (percent < 20) {
-        els.timerBar.style.backgroundColor = 'var(--danger-red)';
-    } else {
-        els.timerBar.style.backgroundColor = 'var(--gartic-blue)';
-    }
+    if (percent < 20) els.timerBar.style.backgroundColor = 'var(--danger-red)';
+    else els.timerBar.style.backgroundColor = 'var(--gartic-blue)';
 });
 
 socket.on('playerListUpdate', ({ scores, playerMap, currentDrawerSocketId }) => {

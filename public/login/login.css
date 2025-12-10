@@ -1,3 +1,8 @@
+/* login/login.css - 手機適配版 */
+
+/* ... (保留原本所有的 :root, body, background-pattern 等樣式) ... */
+
+/* 1. 變數定義 (保持不變) */
 :root {
     --gartic-blue: #0087ff;
     --gartic-yellow: #ffde00; 
@@ -20,11 +25,10 @@ body {
     align-items: center;
     justify-content: center;
     background-color: var(--dark-blue); 
-    overflow-x: hidden;
+    overflow-x: hidden; /* 禁止水平滾動 */
     color: var(--text-dark);
 }
 
-/* 背景圖案 */
 .background-pattern {
     position: fixed;
     top: 0;
@@ -39,7 +43,7 @@ body {
 /* Header */
 .main-header {
     position: absolute;
-    top: 30px;
+    top: 20px;
     width: 90%;
     max-width: 450px;
     display: flex;
@@ -55,6 +59,12 @@ body {
     text-shadow: 3px 3px 0 var(--dark-blue); 
     letter-spacing: -1px;
     margin: 0;
+}
+
+/* 手機版 Logo 調整 */
+@media (max-width: 480px) {
+    .logo { font-size: 2em; }
+    .main-header { top: 10px; }
 }
 
 .user-display {
@@ -78,7 +88,7 @@ body {
     justify-content: center;
 }
 
-/* 主要卡片容器 - 統一風格 */
+/* 主卡片：手機版寬度調整 */
 .main-container {
     width: 90%;
     max-width: 400px;
@@ -90,11 +100,10 @@ body {
     margin-top: 60px;
     position: relative;
     text-align: center;
-    border: 4px solid rgba(255,255,255,0.3); /* 微微的邊框光暈 */
-    background-clip: padding-box;
+    border: 4px solid rgba(255,255,255,0.3);
+    box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
 }
 
-/* 緞帶標題 */
 .ribbon-title {
     display: inline-block;
     background-color: var(--gartic-blue);
@@ -110,7 +119,6 @@ body {
     border: 2px solid white;
 }
 
-/* 用戶資訊區 */
 .user-info-panel h2 {
     color: var(--text-medium);
     font-size: 1em;
@@ -133,7 +141,6 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-/* 輸入框 - 3D 風格 */
 .username-input-wrapper {
     background-color: var(--bg-grey);
     border: 3px solid #ddd;
@@ -160,21 +167,26 @@ body {
     outline: none;
 }
 
-/* 按鈕容器 */
+/* 按鈕容器：手機版改為垂直排列 */
 .buttons-wrapper {
     display: flex;
     gap: 15px;
     padding-top: 10px;
 }
 
-/* 通用 3D 按鈕樣式 */
+@media (max-width: 400px) {
+    .buttons-wrapper {
+        flex-direction: column; /* 螢幕太小時，按鈕上下排 */
+    }
+}
+
 .room-button,
 .play-button {
     flex: 1;
     font-size: 1.3em;
     font-weight: bold;
     border-radius: 12px;
-    padding: 12px 0;
+    padding: 15px 0; /* 加大觸控區域 */
     text-align: center;
     transition: all 0.1s;
     text-decoration: none;
@@ -185,47 +197,41 @@ body {
     position: relative;
     top: 0;
     cursor: pointer;
+    touch-action: manipulation; /* 優化觸控反應 */
 }
 
-/* 房間按鈕 (藍色) */
+/* ... (保留原本的按鈕顏色樣式) ... */
 .room-button {
     background-color: white;
     color: var(--gartic-blue);
     border: 2px solid var(--gartic-blue);
     box-shadow: 0 4px 0 var(--gartic-blue);
 }
-
 .room-button:hover {
     background-color: #f0f8ff;
     top: 2px;
     box-shadow: 0 2px 0 var(--gartic-blue);
 }
-
 .room-button:active {
     top: 4px;
     box-shadow: none;
 }
-
-/* 遊玩按鈕 (黃色) */
 .play-button {
     background-color: var(--gartic-yellow);
     color: var(--text-dark);
     border: 2px solid var(--dark-yellow); 
     box-shadow: 0 4px 0 var(--dark-yellow);
 }
-
 .play-button:hover {
     filter: brightness(1.05);
     top: 2px;
     box-shadow: 0 2px 0 var(--dark-yellow);
 }
-
 .play-button:active {
     top: 4px;
     box-shadow: none;
 }
 
-/* 隱藏元素 */
 .download-section, .login-prompt, .social-login, .game-stats-panel, .main-footer {
     display: none;
 }

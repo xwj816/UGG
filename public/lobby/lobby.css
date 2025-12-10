@@ -1,4 +1,6 @@
-/* lobby/lobby.css - 完整版 (含計分與計時器樣式) */
+/* lobby/lobby.css - 修正按鈕文字換行問題 */
+
+/* ... (保留上面的變數定義與通用樣式，直到 .chat-input-wrapper) ... */
 
 :root {
     --gartic-blue: #0087ff;
@@ -19,9 +21,10 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
+    width: 100vw;
     color: var(--text-dark);
-    background-color: var(--gartic-blue);
-    overflow: hidden; 
+    background-color: var(--dark-blue);
+    overflow: hidden;
 }
 
 .background-pattern {
@@ -42,10 +45,9 @@ body {
     margin: 0 auto;
     padding: 20px;
     box-sizing: border-box;
-    gap: 20px;
+    gap: 15px;
 }
 
-/* 卡片通用 */
 .panel {
     background-color: white;
     border-radius: 12px;
@@ -65,415 +67,135 @@ body {
     flex-shrink: 0;
 }
 
-/* 標題卡片 */
 .game-header-panel {
-    padding: 15px;
+    padding: 10px;
     text-align: center;
     min-height: auto;
     border: none;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.room-title {
-    margin: 0 0 10px 0;
-    font-size: 1.2em;
-    color: var(--text-medium);
-}
-
-.game-status-badge {
-    background-color: var(--gartic-yellow);
-    color: var(--text-dark);
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 0.9em;
-    display: inline-block;
-    border: 2px solid var(--dark-yellow);
-    margin-bottom: 5px;
-}
-
-.current-word-display {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: var(--dark-blue);
-    margin-top: 5px;
-}
+.room-title { margin: 0; font-size: 1.1em; color: var(--text-medium); }
+.timer-container { width: 100%; height: 8px; background-color: #eee; border-radius: 5px; margin: 8px 0; overflow: hidden; border: 1px solid #ccc; }
+.timer-bar { width: 100%; height: 100%; background-color: var(--gartic-blue); transition: width 1s linear, background-color 1s; }
+.game-status-badge { background-color: var(--gartic-yellow); color: var(--text-dark); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 0.9em; display: inline-block; border: 2px solid var(--dark-yellow); }
+.current-word-display { font-size: 1.1em; font-weight: bold; color: var(--dark-blue); margin-top: 5px; }
 
 /* 分數板 */
-.score-board-panel {
-    flex: 1;
-    padding: 0;
-    border: none;
-}
-
-.score-board-panel h3 {
-    background-color: var(--gartic-blue);
-    color: white;
-    margin: 0;
-    padding: 10px;
-    font-size: 1em;
-    text-align: center;
-    border-bottom: 3px solid var(--dark-blue);
-}
-
-.player-list {
-    list-style: none;
-    padding: 10px;
-    margin: 0;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.player-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    background-color: #f9f9f9;
-    border-radius: 6px;
-    border-bottom: 2px solid #eee;
-    align-items: center;
-}
-
-.player-item.self {
-    background-color: #fff8c5;
-    border: 2px solid var(--gartic-yellow);
-}
-
-.player-item.drawer .player-name::before {
-    content: '✏️ ';
-}
-
-/* ★★★ 新增：猜對狀態 ★★★ */
-.player-item.guessed {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-.player-item.guessed .player-name::after {
-    content: ' ✅';
-}
-
-.player-name {
-    font-weight: bold;
-    color: var(--text-dark);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 180px;
-}
-
-.score {
-    background-color: var(--dark-blue);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 0.8em;
-    font-weight: bold;
-}
+.score-board-panel { flex: 1; padding: 0; border: none; min-height: 100px; }
+.score-board-panel h3 { background-color: var(--gartic-blue); color: white; margin: 0; padding: 8px; font-size: 1em; text-align: center; border-bottom: 3px solid var(--dark-blue); }
+.player-list { list-style: none; padding: 5px; margin: 0; overflow-y: auto; flex: 1; }
+.player-item { display: flex; justify-content: space-between; padding: 6px 10px; margin-bottom: 4px; background-color: #f9f9f9; border-radius: 6px; border-bottom: 2px solid #eee; align-items: center; font-size: 0.9em; }
+.player-item.self { background-color: #fff8c5; border: 2px solid var(--gartic-yellow); }
+.player-item.drawer .player-name::before { content: '✏️ '; }
+.player-item.guessed { background-color: #d4edda; border-color: #c3e6cb; }
+.player-item.guessed .player-name::after { content: ' ✅'; }
+.player-name { font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+.score { background-color: var(--dark-blue); color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.8em; font-weight: bold; }
 
 /* 聊天區 */
-.chat-panel {
-    height: 35%;
-    border: none;
+.chat-panel { height: 35%; border: none; display: flex; flex-direction: column; }
+.messages { flex: 1; overflow-y: auto; padding: 8px; background-color: #f4f4f4; font-size: 0.9em; }
+.message { margin: 3px 0; padding: 4px 8px; border-radius: 4px; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.message .user { color: var(--dark-blue); font-weight: bold; }
+.message.system-message { background: none; box-shadow: none; color: var(--text-light); font-style: italic; text-align: center; font-size: 0.85em; }
+
+.chat-input-wrapper { display: flex; padding: 5px; background-color: white; border-top: 1px solid #ddd; }
+#chatInput { flex: 1; border: 2px solid var(--bg-grey); background-color: var(--bg-grey); border-radius: 20px 0 0 20px; padding: 8px 12px; outline: none; font-weight: bold; font-size: 16px; }
+
+/* ★★★ 修正這裡：加入 white-space: nowrap 和 flex-shrink: 0 ★★★ */
+.send-btn { 
+    background-color: var(--gartic-blue); 
+    color: white; 
+    border: none; 
+    border-radius: 0 20px 20px 0; 
+    padding: 0 10px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    
+    /* 強制文字不換行 */
+    white-space: nowrap;
+    
+    /* 禁止按鈕被壓縮 */
+    flex-shrink: 0;
 }
 
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background-color: #f4f4f4;
-    font-size: 0.9em;
-}
-
-.message {
-    margin: 4px 0;
-    padding: 4px 8px;
-    border-radius: 4px;
-    background: white;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-.message .user {
-    color: var(--dark-blue);
-    font-weight: bold;
-}
-
-.message.system-message {
-    background: none;
-    box-shadow: none;
-    color: var(--text-light);
-    font-style: italic;
-    text-align: center;
-    font-size: 0.85em;
-}
-
-.chat-input-wrapper {
-    display: flex;
-    padding: 8px;
-    background-color: white;
-    border-top: 1px solid #ddd;
-}
-
-#chatInput {
-    flex: 1;
-    border: 2px solid var(--bg-grey);
-    background-color: var(--bg-grey);
-    border-radius: 20px 0 0 20px;
-    padding: 8px 12px;
-    outline: none;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-#chatInput:focus {
-    border-color: var(--gartic-blue);
-    background-color: white;
-}
-
-.send-btn {
-    background-color: var(--gartic-blue);
-    color: white;
-    border: none;
-    border-radius: 0 20px 20px 0;
-    padding: 0 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.1s;
-}
-
-.send-btn:hover {
-    background-color: var(--dark-blue);
-}
-
-/* 右側主區域 */
+/* --- 右側繪圖區 --- */
 .drawing-area {
     flex: 1;
     padding: 0;
     position: relative;
     border: 3px solid white;
     background-color: var(--bg-grey);
+    display: flex;
+    flex-direction: column;
+    min-height: 0; 
 }
 
 .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 15px;
+    padding: 8px;
     background-color: white;
     border-bottom: 2px solid #ddd;
+    flex-shrink: 0; 
+    z-index: 10;
 }
+.tool-group { display: flex; gap: 5px; align-items: center; }
 
-.tool-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
+.tool-button, .modal-btn { background-color: white; border: 2px solid var(--panel-border); box-shadow: 0 3px 0 var(--panel-border); border-radius: 8px; padding: 6px 10px; font-size: 1.2em; cursor: pointer; position: relative; top: 0; touch-action: manipulation; }
+.tool-button:active:not(:disabled) { top: 3px; box-shadow: none; }
+.tool-button.active { background-color: var(--gartic-blue); border-color: var(--dark-blue); box-shadow: 0 3px 0 var(--dark-blue); color: white; }
+.special-button, .modal-btn { background-color: var(--gartic-yellow); border: 2px solid var(--dark-yellow); box-shadow: 0 3px 0 var(--dark-yellow); color: var(--text-dark); font-weight: bold; font-size: 1em; }
+.special-button:active { top: 3px; box-shadow: none; }
+.color-palette { display: flex; gap: 4px; align-items: center; background-color: #f0f0f0; padding: 4px; border-radius: 20px; border: 1px solid #ddd; }
+.color-swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(0,0,0,0.1); touch-action: manipulation; }
+.color-swatch.active { transform: scale(1.1); border: 2px solid white; box-shadow: 0 0 0 2px var(--text-dark); z-index: 1; }
+.size-slider { width: 80px; }
 
-/* 3D 按鈕 */
-.tool-button, .modal-btn {
-    background-color: white;
-    border: 2px solid var(--panel-border);
-    box-shadow: 0 3px 0 var(--panel-border);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: all 0.1s;
-    position: relative;
-    top: 0;
-}
-
-.tool-button:hover:not(:disabled) {
-    top: 2px;
-    box-shadow: 0 1px 0 var(--panel-border);
-    background-color: #f9f9f9;
-}
-
-.tool-button:active:not(:disabled) {
-    top: 3px;
-    box-shadow: none;
-}
-
-.tool-button.active {
-    background-color: var(--gartic-blue);
-    border-color: var(--dark-blue);
-    box-shadow: 0 3px 0 var(--dark-blue);
-    color: white;
-}
-
-.tool-button.danger:hover {
-    background-color: var(--danger-red);
-    border-color: var(--danger-dark);
-    box-shadow: 0 1px 0 var(--danger-dark);
-    color: white;
-}
-
-/* 黃色特殊按鈕 */
-.special-button, .modal-btn {
-    background-color: var(--gartic-yellow);
-    border: 2px solid var(--dark-yellow);
-    box-shadow: 0 3px 0 var(--dark-yellow);
-    color: var(--text-dark);
-    font-weight: bold;
-    font-size: 1em;
-}
-
-.special-button:hover, .modal-btn:hover {
-    background-color: #ffc400;
-    box-shadow: 0 1px 0 var(--dark-yellow);
-    top: 2px;
-}
-
-/* 色票樣式 */
-.color-palette {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    background-color: #f0f0f0;
-    padding: 5px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-}
-
-.color-swatch {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid rgba(0,0,0,0.1);
-    transition: transform 0.1s, border-color 0.1s;
-    position: relative;
-}
-
-.color-swatch:hover {
-    transform: scale(1.1);
-    border-color: rgba(0,0,0,0.3);
-}
-
-.color-swatch.active {
-    transform: scale(1.1);
-    border: 2px solid white;
-    box-shadow: 0 0 0 2px var(--text-dark);
-    z-index: 1;
-}
-
-.size-slider {
-    width: 100px;
-    cursor: pointer;
-}
-
-/* 畫布 */
 .canvas-wrapper {
     flex: 1;
     background-color: white;
     cursor: crosshair;
-    overflow: hidden;
-    position: relative;
+    overflow: hidden; 
+    position: relative; 
     box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+    touch-action: none; 
+    width: 100%;
 }
 
 #drawingCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    display: block;
+    display: block; 
+    touch-action: none; 
 }
 
 /* Modal */
-.modal {
-    display: none;
-    position: absolute;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    backdrop-filter: blur(2px);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 25px;
-    border-radius: 15px;
-    width: 300px;
-    text-align: center;
-    border: 4px solid var(--gartic-blue);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-
-.modal-content h3 {
-    color: var(--gartic-blue);
-    margin-top: 0;
-    font-size: 1.5em;
-}
-
-#wordInput {
-    width: 80%;
-    padding: 10px;
-    margin: 15px 0;
-    border: 2px solid var(--panel-border);
-    border-radius: 8px;
-    font-size: 1.2em;
-    text-align: center;
-    outline: none;
-}
-
-#wordInput:focus {
-    border-color: var(--gartic-blue);
-}
-
-.modal-btn {
-    width: 100%;
-    margin-top: 10px;
-}
-
-/* ★★★ 新增：計時器樣式 ★★★ */
-.timer-container {
-    width: 100%;
-    height: 10px;
-    background-color: #eee;
-    border-radius: 5px;
-    margin: 10px 0;
-    overflow: hidden;
-    border: 1px solid #ccc;
-}
-
-.timer-bar {
-    width: 100%; /* 初始滿的 */
-    height: 100%;
-    background-color: var(--gartic-blue);
-    transition: width 1s linear, background-color 1s;
-}
+.modal { display: none; position: absolute; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(2px); justify-content: center; align-items: center; }
+.modal-content { background-color: white; padding: 20px; border-radius: 15px; width: 80%; max-width: 300px; text-align: center; border: 4px solid var(--gartic-blue); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+#wordInput { width: 80%; padding: 8px; margin: 10px 0; border: 2px solid var(--panel-border); border-radius: 8px; font-size: 1.2em; text-align: center; }
 
 /* RWD */
-@media (max-width: 768px) {
-    .game-layout {
-        flex-direction: column;
-        height: auto;
-        min-height: 100vh;
-        padding: 10px;
-    }
-    .sidebar {
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    .game-header-panel, .score-board-panel, .chat-panel {
-        width: 100%;
-    }
-    .drawing-area {
-        height: 50vh;
-    }
-    .color-swatch {
-        width: 20px;
-        height: 20px;
-    }
-    .color-palette {
-        gap: 3px;
-        flex-wrap: wrap;
-        max-width: 150px;
-        justify-content: center;
-    }
+@media (max-width: 900px) {
+    body { padding: 0; }
+    .game-layout { flex-direction: column; padding: 5px; gap: 5px; height: 100vh; width: 100%; }
+    .game-header-panel { order: 1; padding: 5px; flex-direction: row; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    .room-title { font-size: 0.9em; width: 100%; text-align: center; margin-bottom: 2px; }
+    .timer-container { width: 100%; height: 5px; margin: 3px 0; }
+    .drawing-area { order: 2; flex: 2; min-height: 40vh; border-width: 2px; }
+    .toolbar { overflow-x: auto; padding: 5px; justify-content: flex-start; gap: 10px; }
+    .tool-button { font-size: 1.4em; padding: 8px 12px; }
+    .size-slider { display: none; }
+    .color-swatch { width: 28px; height: 28px; }
+    .sidebar { width: 100%; gap: 5px; order: 3; flex: 1; overflow: hidden; }
+    .score-board-panel { order: 3; flex: 0 0 auto; min-height: auto; border-radius: 8px; }
+    .score-board-panel h3 { display: none; }
+    .player-list { display: flex; flex-direction: row; overflow-x: auto; padding: 5px; gap: 5px; white-space: nowrap; }
+    .player-item { flex: 0 0 auto; width: auto; margin: 0; padding: 4px 8px; font-size: 0.85em; }
+    .chat-panel { order: 4; flex: 1; height: auto; min-height: 100px; }
 }

@@ -1,17 +1,15 @@
-/* login/login.css - 手機適配版 */
+/* login/login.css - Sakura Pink Edition */
 
-/* ... (保留原本所有的 :root, body, background-pattern 等樣式) ... */
-
-/* 1. 變數定義 (保持不變) */
 :root {
-    --gartic-blue: #0087ff;
-    --gartic-yellow: #ffde00; 
-    --dark-blue: #0056cc;
-    --dark-yellow: #f6b500;
-    --text-dark: #333;
-    --text-medium: #555;
-    --panel-border: #ccc;
-    --bg-grey: #eee;
+    /* --- Sakura Pink Theme --- */
+    --gartic-blue: #ff8fab;       /* 櫻花粉 (主色) */
+    --gartic-yellow: #ffe066;     /* 奶油黃 (強調色) */
+    --dark-blue: #ff477e;         /* 深玫瑰粉 (背景色) */
+    --dark-yellow: #eeb800;       /* 蜂蜜金 (按鈕陰影) */
+    --text-dark: #6a4f4b;         /* 暖可可棕 (文字) */
+    --text-medium: #8d6e63;       /* 淺棕色 */
+    --panel-border: #ffc2d1;      /* 淺粉紅邊框 */
+    --bg-grey: #fff0f5;           /* 牛奶粉白 (通用背景) */
     --card-shadow: 0 8px 0 rgba(0,0,0,0.1), 0 20px 30px rgba(0,0,0,0.1);
 }
 
@@ -25,7 +23,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: var(--dark-blue); 
-    overflow-x: hidden; /* 禁止水平滾動 */
+    overflow-x: hidden;
     color: var(--text-dark);
 }
 
@@ -35,8 +33,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
+    /* 調整背景圓點，讓深玫瑰底色透出來更柔和 */
+    background-image: radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px);
+    background-size: 30px 30px;
     z-index: -1;
 }
 
@@ -56,12 +55,12 @@ body {
 .logo {
     font-size: 2.5em;
     font-weight: 900;
-    text-shadow: 3px 3px 0 var(--dark-blue); 
+    /* Logo 陰影改為深莓果色，增加對比 */
+    text-shadow: 3px 3px 0 #c2185b; 
     letter-spacing: -1px;
     margin: 0;
 }
 
-/* 手機版 Logo 調整 */
 @media (max-width: 480px) {
     .logo { font-size: 2em; }
     .main-header { top: 10px; }
@@ -88,7 +87,7 @@ body {
     justify-content: center;
 }
 
-/* 主卡片：手機版寬度調整 */
+/* 主卡片 */
 .main-container {
     width: 90%;
     max-width: 400px;
@@ -101,7 +100,7 @@ body {
     position: relative;
     text-align: center;
     border: 4px solid rgba(255,255,255,0.3);
-    box-sizing: border-box; /* 確保 padding 不會撐大寬度 */
+    box-sizing: border-box;
 }
 
 .ribbon-title {
@@ -143,7 +142,7 @@ body {
 
 .username-input-wrapper {
     background-color: var(--bg-grey);
-    border: 3px solid #ddd;
+    border: 3px solid #ffe5ec; /* 邊框調淡 */
     border-radius: 12px;
     padding: 5px;
     margin-bottom: 25px;
@@ -153,6 +152,7 @@ body {
 .username-input-wrapper:focus-within {
     border-color: var(--gartic-blue);
     background-color: white;
+    box-shadow: 0 0 10px rgba(255, 143, 171, 0.3); /* 聚焦時發光 */
 }
 
 #inputUsername {
@@ -167,7 +167,6 @@ body {
     outline: none;
 }
 
-/* 按鈕容器：手機版改為垂直排列 */
 .buttons-wrapper {
     display: flex;
     gap: 15px;
@@ -176,7 +175,7 @@ body {
 
 @media (max-width: 400px) {
     .buttons-wrapper {
-        flex-direction: column; /* 螢幕太小時，按鈕上下排 */
+        flex-direction: column; 
     }
 }
 
@@ -186,7 +185,7 @@ body {
     font-size: 1.3em;
     font-weight: bold;
     border-radius: 12px;
-    padding: 15px 0; /* 加大觸控區域 */
+    padding: 15px 0; 
     text-align: center;
     transition: all 0.1s;
     text-decoration: none;
@@ -197,10 +196,9 @@ body {
     position: relative;
     top: 0;
     cursor: pointer;
-    touch-action: manipulation; /* 優化觸控反應 */
+    touch-action: manipulation;
 }
 
-/* ... (保留原本的按鈕顏色樣式) ... */
 .room-button {
     background-color: white;
     color: var(--gartic-blue);
@@ -208,7 +206,7 @@ body {
     box-shadow: 0 4px 0 var(--gartic-blue);
 }
 .room-button:hover {
-    background-color: #f0f8ff;
+    background-color: #fff0f5; /* 懸停變粉白 */
     top: 2px;
     box-shadow: 0 2px 0 var(--gartic-blue);
 }

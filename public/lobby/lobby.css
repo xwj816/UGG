@@ -1,18 +1,17 @@
-/* lobby/lobby.css - 修正按鈕文字換行問題 */
-
-/* ... (保留上面的變數定義與通用樣式，直到 .chat-input-wrapper) ... */
+/* lobby/lobby.css - Sakura Pink Edition */
 
 :root {
-    --gartic-blue: #0087ff;
-    --gartic-yellow: #ffde00; 
-    --dark-blue: #0056cc;
-    --dark-yellow: #f6b500;
-    --text-dark: #333;
-    --text-medium: #555;
-    --panel-border: #ccc;
-    --bg-grey: #eee;
-    --danger-red: #ff4b4b;
-    --danger-dark: #cc0000;
+    /* --- Sakura Pink Theme --- */
+    --gartic-blue: #ff8fab;       
+    --gartic-yellow: #ffe066;     
+    --dark-blue: #ff477e;         
+    --dark-yellow: #eeb800;       
+    --text-dark: #6a4f4b;         
+    --text-medium: #8d6e63;
+    --panel-border: #ffc2d1;
+    --bg-grey: #fff0f5;           
+    --danger-red: #ff6b6b;
+    --danger-dark: #c92a2a;
     --card-shadow: 0 8px 0 rgba(0,0,0,0.1), 0 20px 30px rgba(0,0,0,0.1);
 }
 
@@ -33,8 +32,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-image: radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px);
+    background-size: 30px 30px;
     z-index: -1;
 }
 
@@ -83,14 +82,34 @@ body {
 
 /* 分數板 */
 .score-board-panel { flex: 1; padding: 0; border: none; min-height: 100px; }
-.score-board-panel h3 { background-color: var(--gartic-blue); color: white; margin: 0; padding: 8px; font-size: 1em; text-align: center; border-bottom: 3px solid var(--dark-blue); }
+.score-board-panel h3 { 
+    background-color: var(--dark-blue); 
+    color: white; 
+    margin: 0; 
+    padding: 8px; 
+    font-size: 1em; 
+    text-align: center; 
+    border-bottom: 3px solid #c2185b; 
+}
+
 .player-list { list-style: none; padding: 5px; margin: 0; overflow-y: auto; flex: 1; }
 .player-item { display: flex; justify-content: space-between; padding: 6px 10px; margin-bottom: 4px; background-color: #f9f9f9; border-radius: 6px; border-bottom: 2px solid #eee; align-items: center; font-size: 0.9em; }
-.player-item.self { background-color: #fff8c5; border: 2px solid var(--gartic-yellow); }
+
+/* 自己 (高亮色) */
+.player-item.self { 
+    background-color: #ffdeeb; 
+    border: 2px solid var(--gartic-blue); 
+}
 .player-item.drawer .player-name::before { content: '✏️ '; }
-.player-item.guessed { background-color: #d4edda; border-color: #c3e6cb; }
+
+/* 猜對的人 (薄荷綠) */
+.player-item.guessed { 
+    background-color: #e6fcf5; 
+    border-color: #63e6be; 
+}
 .player-item.guessed .player-name::after { content: ' ✅'; }
-.player-name { font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+
+.player-name { font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; color: var(--text-dark); }
 .score { background-color: var(--dark-blue); color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.8em; font-weight: bold; }
 
 /* 聊天區 */
@@ -98,12 +117,11 @@ body {
 .messages { flex: 1; overflow-y: auto; padding: 8px; background-color: #f4f4f4; font-size: 0.9em; }
 .message { margin: 3px 0; padding: 4px 8px; border-radius: 4px; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .message .user { color: var(--dark-blue); font-weight: bold; }
-.message.system-message { background: none; box-shadow: none; color: var(--text-light); font-style: italic; text-align: center; font-size: 0.85em; }
+.message.system-message { background: none; box-shadow: none; color: var(--text-medium); font-style: italic; text-align: center; font-size: 0.85em; }
 
 .chat-input-wrapper { display: flex; padding: 5px; background-color: white; border-top: 1px solid #ddd; }
-#chatInput { flex: 1; border: 2px solid var(--bg-grey); background-color: var(--bg-grey); border-radius: 20px 0 0 20px; padding: 8px 12px; outline: none; font-weight: bold; font-size: 16px; }
+#chatInput { flex: 1; border: 2px solid var(--bg-grey); background-color: var(--bg-grey); border-radius: 20px 0 0 20px; padding: 8px 12px; outline: none; font-weight: bold; font-size: 16px; color: var(--text-dark); }
 
-/* ★★★ 修正這裡：加入 white-space: nowrap 和 flex-shrink: 0 ★★★ */
 .send-btn { 
     background-color: var(--gartic-blue); 
     color: white; 
@@ -112,11 +130,7 @@ body {
     padding: 0 10px; 
     font-weight: bold; 
     cursor: pointer; 
-    
-    /* 強制文字不換行 */
     white-space: nowrap;
-    
-    /* 禁止按鈕被壓縮 */
     flex-shrink: 0;
 }
 

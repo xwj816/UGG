@@ -1,15 +1,15 @@
-/* room/room.css - 手機適配版 */
+/* room/room.css - Sakura Pink Edition */
 
-/* ... (保留 :root, body, background-pattern) ... */
 :root {
-    --gartic-blue: #0087ff;
-    --gartic-yellow: #ffde00; 
-    --dark-blue: #0056cc;
-    --dark-yellow: #f6b500;
-    --text-dark: #333;
-    --text-medium: #555;
-    --panel-border: #ccc;
-    --bg-grey: #eee;
+    /* --- Sakura Pink Theme --- */
+    --gartic-blue: #ff8fab;       
+    --gartic-yellow: #ffe066;     
+    --dark-blue: #ff477e;         
+    --dark-yellow: #eeb800;       
+    --text-dark: #6a4f4b;         
+    --text-medium: #8d6e63;
+    --panel-border: #ffc2d1;
+    --bg-grey: #fff0f5;           
     --card-shadow: 0 8px 0 rgba(0,0,0,0.1), 0 20px 30px rgba(0,0,0,0.1);
 }
 
@@ -34,8 +34,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-image: radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px);
+    background-size: 30px 30px;
     z-index: -1;
 }
 
@@ -54,7 +54,7 @@ body {
 .logo {
     font-size: 2.5em;
     font-weight: 900;
-    text-shadow: 3px 3px 0 var(--dark-blue); 
+    text-shadow: 3px 3px 0 #c2185b; 
     letter-spacing: -1px;
     margin: 0;
 }
@@ -78,9 +78,9 @@ body {
     justify-content: center;
 }
 
-/* 主容器：RWD 修正 */
+/* 主容器 */
 .main-container {
-    width: 90%; /* 手機上佔 90% */
+    width: 90%; 
     max-width: 400px; 
     background-color: white;
     border-radius: 20px;
@@ -114,7 +114,7 @@ body {
     box-shadow: 0 5px 0 var(--dark-blue);
     border: 2px solid white;
     z-index: 5;
-    white-space: nowrap; /* 防止標題換行 */
+    white-space: nowrap; 
 }
 
 .back-link-icon {
@@ -147,7 +147,6 @@ body {
     box-shadow: none;
 }
 
-/* 內容區塊 */
 .content-wrapper {
     display: flex;
     flex-direction: column;
@@ -171,22 +170,21 @@ body {
     opacity: 0.8;
 }
 
-/* 代碼顯示：手機字體縮小 */
 .invite-code-display {
     font-size: 2.2em;
     font-weight: bold;
     letter-spacing: 3px;
     color: var(--dark-blue);
-    border: 3px dashed #ccc;
+    border: 3px dashed var(--panel-border);
     padding: 15px;
-    background-color: #fcfcfc; 
+    background-color: #fffafa; 
     border-radius: 12px;
     cursor: pointer;
     user-select: none;
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 15px;
-    word-break: break-all; /* 防止代碼溢出 */
+    word-break: break-all;
 }
 
 @media (max-width: 400px) {
@@ -199,7 +197,7 @@ body {
     border: 2px solid var(--dark-yellow); 
     font-size: 1.1em;
     font-weight: bold;
-    padding: 12px 30px; /* 加大觸控區 */
+    padding: 12px 30px; 
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.1s;
@@ -219,7 +217,7 @@ body {
 
 .code-input-wrapper {
     background-color: var(--bg-grey);
-    border: 3px solid #ddd;
+    border: 3px solid #ffe5ec;
     border-radius: 12px;
     padding: 5px;
     margin-bottom: 15px;
